@@ -96,16 +96,6 @@ body {
     font-weight: 600;
     letter-spacing: 0.5px;
 }
-.loader-tip {
-    position: absolute;
-    bottom: 28px;
-    left: 0; right: 0;
-    text-align: center;
-    font-size: 10px;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-.loader-tip a { color: var(--text-secondary); text-decoration: none; font-weight: 800; }
 
 /* ============ APP SHELL ============ */
 .app {
@@ -115,7 +105,7 @@ body {
     padding-top: env(safe-area-inset-top);
 }
 
-/* ============ HEADER (Desktop + Mobile) ============ */
+/* ============ HEADER ============ */
 .header {
     position: sticky;
     top: 0;
@@ -152,7 +142,6 @@ body {
 }
 .brand-name span { color: var(--text-muted); font-weight: 600; }
 
-/* Desktop nav (скрыт на мобиле) */
 .header-nav {
     display: none;
     align-items: center;
@@ -175,7 +164,6 @@ body {
 .header-nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
 .header-nav-btn.active { color: var(--text); background: rgba(255,255,255,0.06); }
 
-/* Desktop search (в хедере) */
 .header-search {
     display: none;
     flex: 1;
@@ -216,10 +204,8 @@ body {
 .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 .icon-btn:active { transform: scale(0.95); }
 .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; }
-.icon-btn.admin { display: none; background: rgba(47,128,237,0.1); border-color: rgba(47,128,237,0.3); color: var(--accent); }
-.icon-btn.admin.visible { display: flex; }
 
-/* Mobile search bar (под хедером) */
+/* Mobile search */
 .mobile-search {
     padding: 12px 20px 8px;
     position: relative;
@@ -251,10 +237,10 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     gap: 24px;
-    padding: 0 20px 100px;
+    padding: 0 20px 180px;
 }
 
-/* Sidebar (только Desktop) */
+/* Sidebar */
 .sidebar { display: none; width: 240px; flex-shrink: 0; padding-top: 20px; }
 .sidebar-block {
     background: var(--bg-card);
@@ -299,6 +285,7 @@ body {
 .sidebar-price-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .sidebar-price-input {
     flex: 1;
+    min-width: 0;
     padding: 9px 10px;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -308,6 +295,12 @@ body {
     font-family: inherit;
     outline: none;
 }
+.sidebar-price-input::-webkit-outer-spin-button,
+.sidebar-price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.sidebar-price-input[type=number] { -moz-appearance: textfield; }
 .sidebar-price-input:focus { border-color: var(--border-hover); }
 
 .sidebar-sort {
@@ -369,7 +362,7 @@ body {
     position: relative;
 }
 
-/* Page title */
+/* Page head */
 .page-head {
     display: flex;
     align-items: center;
@@ -387,7 +380,7 @@ body {
     font-weight: 700;
 }
 
-/* Category chips (mobile) */
+/* Category chips */
 .cats-scroll {
     display: flex;
     gap: 8px;
@@ -426,7 +419,6 @@ body {
     gap: 12px;
 }
 
-/* Product card */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -566,7 +558,7 @@ body {
 .empty-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .empty-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 
-/* ============ DETAIL PAGE ============ */
+/* ============ DETAIL ============ */
 .back-btn {
     display: inline-flex;
     align-items: center;
@@ -718,7 +710,7 @@ body {
 }
 .btn-secondary:hover { background: rgba(255,255,255,0.06); color: var(--text); }
 
-/* ============ PROFILE (Wave style) ============ */
+/* ============ PROFILE ============ */
 .profile-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -811,7 +803,6 @@ body {
     font-weight: 600;
 }
 
-/* Profile promo cards */
 .promo-card {
     border-radius: var(--radius);
     padding: 20px;
@@ -823,10 +814,6 @@ body {
 }
 .promo-card:hover { transform: translateY(-2px); }
 .promo-card:active { transform: scale(0.99); }
-.promo-card.tiktok {
-    background: linear-gradient(135deg, #1a1a24 0%, #2a1a1a 60%, #3a1a2a 100%);
-    border: 1px solid rgba(239,68,68,0.2);
-}
 .promo-card.referral {
     background: linear-gradient(135deg, #1e3a8a 0%, #2f80ed 60%, #7c3aed 100%);
 }
@@ -848,9 +835,9 @@ body {
     font-size: 12px;
     color: rgba(255,255,255,0.75);
     line-height: 1.5;
+    word-break: break-all;
 }
 
-/* Profile menu */
 .profile-menu { display: flex; flex-direction: column; gap: 8px; }
 .profile-menu-item {
     display: flex;
@@ -877,6 +864,10 @@ body {
 }
 .profile-menu-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; }
 .profile-menu-arrow { color: var(--text-muted); font-size: 18px; }
+
+/* Admin menu item (скрыт по умолчанию) */
+#admin-menu-item { display: none; }
+#admin-menu-item.visible { display: flex; }
 
 /* ============ ORDERS ============ */
 .orders-list { display: flex; flex-direction: column; gap: 10px; }
@@ -909,7 +900,7 @@ body {
 .order-price { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; }
 .order-date { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 600; }
 
-/* ============ BOTTOM NAV (Mobile) ============ */
+/* ============ BOTTOM NAV ============ */
 .bottom-nav {
     position: fixed;
     bottom: 16px;
@@ -1023,7 +1014,6 @@ body {
 .form-input:focus, .form-textarea:focus { border-color: var(--border-hover); background: rgba(47,128,237,0.04); }
 .form-textarea { resize: vertical; min-height: 80px; }
 
-/* Admin list */
 .admin-item {
     display: flex; align-items: center; gap: 12px;
     padding: 12px;
@@ -1081,18 +1071,30 @@ body {
 .toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
 .toast.error { border-color: rgba(239,68,68,0.4); color: var(--danger); }
 
-/* ============ FOOTER ============ */
+/* ============ FOOTER (прижат к низу) ============ */
 .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 20px calc(90px + env(safe-area-inset-bottom));
     text-align: center;
-    padding: 28px 20px 16px;
     font-size: 11px;
     color: var(--text-muted);
     font-weight: 600;
     letter-spacing: 0.3px;
+    background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.8) 50%, transparent 100%);
+    z-index: 40;
+    pointer-events: none;
 }
-.footer a { color: var(--text-secondary); text-decoration: none; font-weight: 800; }
+.footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 800;
+    pointer-events: auto;
+}
 
-/* ============ PAGES ============ */
+/* ============ PAGE ============ */
 .page { display: none; }
 .page.active { display: block; animation: pageIn 0.3s cubic-bezier(0.16,1,0.3,1); }
 @keyframes pageIn {
@@ -1102,12 +1104,18 @@ body {
 
 /* ============ RESPONSIVE ============ */
 
+/* Скрываем кнопку профиля в хедере на мобиле */
+@media (max-width: 1023px) {
+    .header-actions .icon-btn.profile-btn { display: none; }
+    .header-actions { gap: 0; }
+}
+
 /* Планшет: 3 колонки */
 @media (min-width: 640px) {
     .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Планшет: показываем sidebar, скрываем mobile search */
+/* Планшет: sidebar */
 @media (min-width: 768px) {
     .sidebar { display: block; }
     .mobile-search { display: none; }
@@ -1115,12 +1123,12 @@ body {
     .header-search { display: block; }
 }
 
-/* Desktop: показываем навигацию в хедере, 4 колонки */
+/* Desktop */
 @media (min-width: 1024px) {
     .header { padding: 0 32px; }
     .header-nav { display: flex; }
     .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .main { padding: 0 32px 100px; gap: 32px; }
+    .main { padding: 0 32px 120px; gap: 32px; }
     .sidebar { width: 260px; padding-top: 24px; }
     .content { padding-top: 24px; }
     .bottom-nav { display: none; }
@@ -1129,9 +1137,17 @@ body {
     .detail-info { padding-left: 8px; }
     .promo { padding: 28px 32px; }
     .promo-title { font-size: 22px; }
+    
+    /* Футер на ПК — обычный, не фиксированный */
+    .footer {
+        position: static;
+        padding: 20px;
+        background: none;
+        pointer-events: auto;
+    }
 }
 
-/* Очень широкие экраны */
+/* Широкие экраны */
 @media (min-width: 1400px) {
     .grid { grid-template-columns: repeat(5, 1fr); }
 }
@@ -1139,7 +1155,7 @@ body {
 </head>
 <body>
 
-<!-- ============ LOADER ============ -->
+<!-- LOADER -->
 <div id="loader">
     <div class="loader-inner">
         <div class="loader-logo">QuickMarket</div>
@@ -1147,10 +1163,9 @@ body {
         <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
         <div class="loader-status" id="loader-status">Инициализация...</div>
     </div>
-    <div class="loader-tip">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
 </div>
 
-<!-- ============ APP ============ -->
+<!-- APP -->
 <div class="app">
 
     <!-- HEADER -->
@@ -1162,24 +1177,19 @@ body {
             <div class="brand-name">Quick<span>Market</span></div>
         </div>
 
-        <!-- Desktop nav -->
         <nav class="header-nav" id="header-nav">
             <button class="header-nav-btn active" data-page="catalog">Каталог</button>
             <button class="header-nav-btn" data-page="orders">Заказы</button>
             <button class="header-nav-btn" data-page="favorites">Избранное</button>
         </nav>
 
-        <!-- Desktop search -->
         <div class="header-search">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" placeholder="Поиск товаров..." id="desktop-search-input">
         </div>
 
         <div class="header-actions">
-            <button class="icon-btn admin" id="admin-btn" onclick="showPage('admin')">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.1.4.38.75.75.91.37.16.8.14 1.16-.06l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 15z"/></svg>
-            </button>
-            <button class="icon-btn" onclick="showPage('profile')">
+            <button class="icon-btn profile-btn" onclick="showPage('profile')">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </button>
         </div>
@@ -1191,10 +1201,9 @@ body {
         <input type="text" placeholder="Поиск товаров..." id="mobile-search-input">
     </div>
 
-    <!-- ============ CATALOG PAGE ============ -->
+    <!-- CATALOG -->
     <div class="page active" id="page-catalog">
         <div class="main">
-            <!-- SIDEBAR (Desktop) -->
             <aside class="sidebar">
                 <div class="sidebar-block">
                     <div class="sidebar-title">Категории</div>
@@ -1219,32 +1228,26 @@ body {
                 </div>
             </aside>
 
-            <!-- CONTENT -->
             <div class="content">
-                <!-- PROMO -->
-                <div class="promo" onclick="showPage('profile')">
+                <div class="promo" onclick="showToast('Ссылка появится скоро')">
                     <div class="promo-label">Реферальная программа</div>
                     <div class="promo-title">Получайте 20% от покупок друзей</div>
                     <div class="promo-text">Приглашайте друзей и зарабатывайте на их покупках</div>
                 </div>
 
-                <!-- Mobile categories -->
                 <div class="cats-scroll" id="mobile-cats"></div>
 
-                <!-- Page head -->
                 <div class="page-head">
                     <h2>Каталог</h2>
                     <span class="page-head-count" id="catalog-count">0 товаров</span>
                 </div>
 
-                <!-- Grid -->
                 <div class="grid" id="grid"></div>
             </div>
         </div>
-        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
     </div>
 
-    <!-- ============ DETAIL PAGE ============ -->
+    <!-- DETAIL -->
     <div class="page" id="page-detail">
         <div class="main">
             <div class="content">
@@ -1274,10 +1277,9 @@ body {
                 </div>
             </div>
         </div>
-        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
     </div>
 
-    <!-- ============ FAVORITES PAGE ============ -->
+    <!-- FAVORITES -->
     <div class="page" id="page-favorites">
         <div class="main">
             <div class="content">
@@ -1288,10 +1290,9 @@ body {
                 <div class="grid" id="fav-grid"></div>
             </div>
         </div>
-        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
     </div>
 
-    <!-- ============ ORDERS PAGE ============ -->
+    <!-- ORDERS -->
     <div class="page" id="page-orders">
         <div class="main">
             <div class="content">
@@ -1302,10 +1303,9 @@ body {
                 <div class="orders-list" id="orders-list"></div>
             </div>
         </div>
-        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
     </div>
 
-    <!-- ============ PROFILE PAGE ============ -->
+    <!-- PROFILE -->
     <div class="page" id="page-profile">
         <div class="main">
             <div class="content">
@@ -1336,10 +1336,10 @@ body {
                     </div>
                 </div>
 
-                <div class="promo-card referral" onclick="scrollToReferral()">
+                <div class="promo-card referral" onclick="copyRefLink()">
                     <div class="promo-card-label">Реферальная программа</div>
                     <div class="promo-card-title">Получайте 20% от покупок друзей</div>
-                    <div class="promo-card-text">Приглашайте друзей и зарабатывайте</div>
+                    <div class="promo-card-text" id="ref-link-text">t.me/WebAppVPNbot?start=ref_...</div>
                 </div>
 
                 <div class="profile-menu">
@@ -1364,13 +1364,19 @@ body {
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
+                    <div class="profile-menu-item" id="admin-menu-item" onclick="showPage('admin')">
+                        <div class="profile-menu-left">
+                            <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.1.4.38.75.75.91.37.16.8.14 1.16-.06l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 15z"/></svg></div>
+                            Админ-панель
+                        </div>
+                        <div class="profile-menu-arrow">›</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
     </div>
 
-    <!-- ============ ADMIN PAGE ============ -->
+    <!-- ADMIN -->
     <div class="page" id="page-admin">
         <div class="main">
             <div class="content">
@@ -1384,7 +1390,7 @@ body {
         </div>
     </div>
 
-    <!-- BOTTOM NAV (Mobile) -->
+    <!-- BOTTOM NAV -->
     <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-btn active" data-page="catalog">
             <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -1405,7 +1411,10 @@ body {
     </nav>
 </div>
 
-<!-- ============ MODALS ============ -->
+<!-- Футер (глобальный) -->
+<div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+
+<!-- MODALS -->
 <div class="modal-overlay" id="support-modal">
     <div class="modal">
         <h3>Поддержка</h3>
@@ -1438,20 +1447,15 @@ if (tg) {
     tg.ready();
     tg.expand();
     
-    // Fullscreen (Bot API 8.0+)
     if (tg.requestFullscreen) {
         tg.requestFullscreen();
     }
     
-    // Цвета
     tg.setHeaderColor('#0a0a0f');
     tg.setBackgroundColor('#0a0a0f');
     tg.setBottomBarColor('#0a0a0f');
     
-    // Отключаем вертикальные свайпы (для fullscreen)
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
-    
-    // Разрешаем закрытие
     if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
 }
 
@@ -1511,7 +1515,6 @@ async function loadProducts() {
         const data = await apiGet('/products');
         products = Object.values(data);
         
-        // Предзагрузка картинок
         const urls = products.flatMap(p => p.images || []).filter(Boolean);
         await Promise.all(urls.map(url => new Promise(resolve => {
             const img = new Image();
@@ -1540,7 +1543,7 @@ async function init() {
         
         renderAll();
         
-        if (isAdmin) document.getElementById('admin-btn').classList.add('visible');
+        if (isAdmin) document.getElementById('admin-menu-item').classList.add('visible');
         
         checkDeepLink();
     }, 400);
@@ -1594,13 +1597,11 @@ function renderCats() {
     const cats = ['all', ...new Set(products.map(p => p.type || 'other'))];
     const labels = { all: 'Все', bot: 'Боты', webapp: 'WebApp', other: 'Другое' };
     
-    // Mobile chips
     const mobileCats = document.getElementById('mobile-cats');
     mobileCats.innerHTML = cats.map(cat => 
         `<button class="cat-chip ${activeCat === cat ? 'active' : ''}" onclick="setCat('${cat}')">${labels[cat] || cat}</button>`
     ).join('');
     
-    // Sidebar
     const sidebarCats = document.getElementById('sidebar-cats');
     sidebarCats.innerHTML = cats.map(cat => {
         const count = products.filter(p => cat === 'all' || (p.type || 'other') === cat).length;
@@ -1741,6 +1742,10 @@ function renderProfile() {
     
     document.getElementById('stat-purchases').textContent = userOrders.length;
     document.getElementById('stat-spent').textContent = spent + ' ₽';
+    
+    // Реф-ссылка заглушка
+    const refLink = `t.me/WebAppVPNbot?start=ref_${user.id}`;
+    document.getElementById('ref-link-text').textContent = refLink;
 }
 
 function renderAdmin() {
@@ -1914,7 +1919,7 @@ async function pollPayment(txId) {
                 const ord = orders.find(o => o.transactionId === txId);
                 if (ord) { ord.status = 'completed'; localStorage.setItem('qm_orders', JSON.stringify(orders)); }
                 document.getElementById('pay-content').innerHTML = `
-                    <div style="font-size:48px;margin:16px 0;">✅</div>
+                    <div style="font-size:48px;margin:16px 0;">✓</div>
                     <h3 style="margin-bottom:12px;">Оплата прошла!</h3>
                     <p>Напишите <b>@qmarket_support</b></p>
                     <button class="btn-primary" onclick="closeModal('payment-modal');showPage('orders')">Мои заказы</button>
@@ -2031,6 +2036,17 @@ document.getElementById('desktop-search-input').addEventListener('input', (e) =>
     updateCounts();
 });
 
+// ========== REFERRAL ==========
+function copyRefLink() {
+    const link = `https://t.me/WebAppVPNbot?start=ref_${user.id}`;
+    navigator.clipboard.writeText(link).then(() => {
+        showToast('Ссылка скопирована', 'success');
+    }).catch(() => {
+        showToast('Не удалось скопировать', 'error');
+    });
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
 // ========== SUPPORT ==========
 function openSupport() { document.getElementById('support-modal').classList.add('active'); }
 
@@ -2047,11 +2063,6 @@ function showToast(text, type = '') {
     toast.className = 'toast show ' + type;
     clearTimeout(window._toastTimer);
     window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-}
-
-function scrollToReferral() {
-    showPage('profile');
-    showToast('Ссылка на рефку будет в @WebAppVPNbot');
 }
 
 // ========== START ==========
