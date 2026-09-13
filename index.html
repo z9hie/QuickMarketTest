@@ -26,10 +26,12 @@
     --danger: #ef4444;
     --danger-bg: rgba(239,68,68,0.12);
     --warning: #eab308;
+    --purple: #a855f7;
     --radius: 16px;
     --radius-sm: 12px;
     --header-h: 60px;
 }
+
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow-x: hidden; }
 body {
@@ -123,10 +125,7 @@ body {
 .mobile-search input::placeholder { color: var(--text-muted); }
 
 /* MAIN */
-.main {
-    flex: 1; display: flex; width: 100%; max-width: 1400px;
-    margin: 0 auto; gap: 24px; padding: 0 20px 180px;
-}
+.main { flex: 1; display: flex; width: 100%; max-width: 1400px; margin: 0 auto; gap: 24px; padding: 0 20px 180px; }
 .sidebar { display: none; width: 240px; flex-shrink: 0; padding-top: 20px; }
 .sidebar-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
 .sidebar-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 14px; }
@@ -205,6 +204,25 @@ body {
     font-size: 9px; font-weight: 800; letter-spacing: 0.6px;
     text-transform: uppercase; color: var(--text-secondary); z-index: 2;
 }
+.card-badges {
+    position: absolute; bottom: 10px; left: 10px;
+    display: flex; gap: 4px; flex-wrap: wrap; z-index: 2; max-width: 90%;
+}
+.badge-chip {
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid;
+    backdrop-filter: blur(8px);
+}
+.badge-hit { background: rgba(239,68,68,0.2); color: #ff6b6b; border-color: rgba(239,68,68,0.4); }
+.badge-new { background: rgba(47,128,237,0.2); color: #4a9eff; border-color: rgba(47,128,237,0.4); }
+.badge-discount { background: rgba(34,197,94,0.2); color: #4ade80; border-color: rgba(34,197,94,0.4); }
+.badge-recommended { background: rgba(168,85,247,0.2); color: #c084fc; border-color: rgba(168,85,247,0.4); }
+
 .card-fav {
     position: absolute; top: 10px; right: 10px; width: 32px; height: 32px;
     background: rgba(10,10,15,0.7); backdrop-filter: blur(8px);
@@ -283,6 +301,7 @@ body {
     padding: 4px 10px; background: rgba(47,128,237,0.1);
     border: 1px solid rgba(47,128,237,0.25); border-radius: 100px; margin-bottom: 12px;
 }
+.detail-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .detail-name { font-size: 24px; font-weight: 900; line-height: 1.15; letter-spacing: -1px; margin-bottom: 10px; }
 .detail-price { font-size: 30px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 12px; }
 .detail-balance-hint {
@@ -436,7 +455,12 @@ body {
 
 /* ORDERS */
 .orders-list { display: flex; flex-direction: column; gap: 10px; }
-.order-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; }
+.order-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px;
+    cursor: pointer; transition: all 0.2s;
+}
+.order-card:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
 .order-header { display: flex; align-items: start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .order-name { font-size: 14px; font-weight: 700; line-height: 1.35; flex: 1; }
 .order-badge {
@@ -449,6 +473,23 @@ body {
 .order-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
 .order-price { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; }
 .order-date { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 600; }
+
+/* ORDER DETAIL MODAL */
+.order-detail-img {
+    width: 100%; aspect-ratio: 1; max-height: 200px;
+    object-fit: cover; border-radius: 12px; background: var(--bg-elevated);
+    margin-bottom: 14px;
+}
+.order-detail-row {
+    display: flex; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+.order-detail-row:last-child { border-bottom: none; }
+.order-detail-label { color: var(--text-muted); font-weight: 600; }
+.order-detail-value { color: var(--text); font-weight: 700; text-align: right; }
+.order-detail-value.green { color: var(--green); }
+.order-detail-value.accent { color: var(--accent); }
 
 /* BOTTOM NAV */
 .bottom-nav {
@@ -524,15 +565,45 @@ body {
     border: 1px solid var(--border);
 }
 
+.promo-input-row {
+    display: flex; gap: 8px; margin: 12px 0;
+}
+.promo-input {
+    flex: 1; padding: 12px 14px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 11px; color: var(--text); font-size: 13px;
+    font-family: inherit; outline: none; text-transform: uppercase;
+}
+.promo-input::placeholder { color: var(--text-muted); text-transform: none; }
+.promo-input:focus { border-color: var(--accent); }
+.promo-apply-btn {
+    padding: 12px 18px; background: var(--accent); color: #fff;
+    border: none; border-radius: 11px; font-size: 13px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+}
+.promo-applied {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--green-bg);
+    border: 1px solid rgba(34,197,94,0.25); border-radius: 11px;
+    margin: 12px 0; font-size: 13px;
+}
+.promo-applied-text { color: var(--green); font-weight: 700; }
+.promo-applied-remove {
+    background: none; border: none; color: var(--danger);
+    font-size: 18px; cursor: pointer; font-family: inherit; padding: 0 4px;
+}
+.promo-error { color: var(--danger); font-size: 12px; font-weight: 700; margin: 8px 0; }
+
 .form-group { text-align: left; margin-bottom: 12px; }
 .form-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-.form-input, .form-textarea {
+.form-input, .form-textarea, .form-select {
     width: 100%; padding: 12px 14px;
     background: rgba(255,255,255,0.03); border: 1px solid var(--border);
     border-radius: 11px; color: var(--text); font-size: 14px;
     font-family: inherit; outline: none;
 }
 .form-textarea { resize: vertical; min-height: 80px; }
+.form-select { cursor: pointer; }
 
 .admin-item {
     display: flex; align-items: center; gap: 12px;
@@ -551,6 +622,95 @@ body {
     color: var(--danger); padding: 8px 12px; border-radius: 9px;
     font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; flex-shrink: 0;
 }
+
+/* ADMIN TABS */
+.admin-tabs {
+    display: flex; gap: 6px; margin-bottom: 20px;
+    overflow-x: auto; scrollbar-width: none; padding-bottom: 4px;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+.admin-tab {
+    flex-shrink: 0; padding: 10px 16px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 11px; font-size: 13px; font-weight: 700;
+    color: var(--text-secondary); cursor: pointer;
+    font-family: inherit; white-space: nowrap;
+}
+.admin-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+.stats-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px;
+}
+.stats-card-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+.stats-card-value { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+.stats-card-value.accent { color: var(--accent); }
+.stats-card-value.green { color: var(--green); }
+.stats-card-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+
+.stats-revenue {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2f80ed 60%, #7c3aed 100%);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+}
+.stats-revenue::before {
+    content: ""; position: absolute; top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+    border-radius: 50%;
+}
+.stats-revenue-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 6px; position: relative; }
+.stats-revenue-value { font-size: 36px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 4px; position: relative; }
+.stats-revenue-sub { font-size: 12px; color: rgba(255,255,255,0.75); position: relative; }
+
+.stats-top-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.stats-top-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 12px;
+}
+.stats-top-rank {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(47,128,237,0.15); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; flex-shrink: 0;
+}
+.stats-top-name { flex: 1; margin: 0 12px; font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-top-count { font-size: 14px; font-weight: 900; color: var(--green); }
+
+/* REVIEWS */
+.reviews-list { display: flex; flex-direction: column; gap: 12px; }
+.review-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px;
+}
+.review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.review-author { display: flex; align-items: center; gap: 10px; }
+.review-avatar {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2f80ed, #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff;
+}
+.review-name { font-size: 13px; font-weight: 700; }
+.review-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+.review-stars { color: var(--warning); font-size: 14px; letter-spacing: 1px; }
+.review-text { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+.review-product { font-size: 11px; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
+.review-pending-badge {
+    font-size: 9px; font-weight: 800; padding: 3px 8px;
+    background: rgba(234,179,8,0.15); color: var(--warning);
+    border-radius: 100px; text-transform: uppercase;
+}
+
+.star-input { display: flex; gap: 6px; justify-content: center; margin: 12px 0; }
+.star-input .star {
+    font-size: 32px; cursor: pointer; color: var(--text-muted);
+    transition: all 0.15s; line-height: 1;
+}
+.star-input .star.active { color: var(--warning); transform: scale(1.1); }
 
 /* TOAST */
 .toast {
@@ -583,6 +743,23 @@ body {
 .page.active { display: block; animation: pageIn 0.3s cubic-bezier(0.16,1,0.3,1); }
 @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+/* LANG SWITCHER */
+.lang-switch {
+    display: flex; align-items: center; gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 2px;
+}
+.lang-btn {
+    padding: 6px 10px; border-radius: 8px;
+    font-size: 11px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    background: none; border: none;
+    color: var(--text-muted); transition: all 0.2s;
+    text-transform: uppercase;
+}
+.lang-btn.active { background: var(--accent); color: #fff; }
+
 /* RESPONSIVE */
 @media (max-width: 1023px) {
     .header-actions .icon-btn.profile-btn { display: none; }
@@ -610,6 +787,7 @@ body {
     .promo { padding: 28px 32px; }
     .promo-title { font-size: 22px; }
     .footer { position: static; padding: 20px; background: none; pointer-events: auto; }
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (min-width: 1400px) {
     .grid { grid-template-columns: repeat(5, 1fr); }
@@ -618,7 +796,6 @@ body {
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="loader">
     <div class="loader-inner">
         <div class="loader-logo">QuickMarket</div>
@@ -628,10 +805,8 @@ body {
     </div>
 </div>
 
-<!-- APP -->
 <div class="app">
 
-    <!-- HEADER -->
     <header class="header">
         <div class="brand">
             <div class="brand-mark">
@@ -641,18 +816,23 @@ body {
         </div>
 
         <nav class="header-nav" id="header-nav">
-            <button class="header-nav-btn active" data-page="catalog">Каталог</button>
-            <button class="header-nav-btn" data-page="level">Level</button>
-            <button class="header-nav-btn" data-page="orders">Заказы</button>
-            <button class="header-nav-btn" data-page="favorites">Избранное</button>
+            <button class="header-nav-btn active" data-page="catalog" data-i18n="nav_catalog">Каталог</button>
+            <button class="header-nav-btn" data-page="level" data-i18n="nav_level">Level</button>
+            <button class="header-nav-btn" data-page="reviews" data-i18n="nav_reviews">Отзывы</button>
+            <button class="header-nav-btn" data-page="orders" data-i18n="nav_orders">Заказы</button>
+            <button class="header-nav-btn" data-page="favorites" data-i18n="nav_favorites">Избранное</button>
         </nav>
 
         <div class="header-search">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" placeholder="Поиск товаров..." id="desktop-search-input">
+            <input type="text" placeholder="Поиск товаров..." id="desktop-search-input" data-i18n-ph="search_placeholder">
         </div>
 
         <div class="header-actions">
+            <div class="lang-switch">
+                <button class="lang-btn active" data-lang="ru">RU</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
             <button class="icon-btn profile-btn" onclick="showPage('profile')">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </button>
@@ -661,7 +841,7 @@ body {
 
     <div class="mobile-search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Поиск товаров..." id="mobile-search-input">
+        <input type="text" placeholder="Поиск товаров..." id="mobile-search-input" data-i18n-ph="search_placeholder">
     </div>
 
     <!-- CATALOG -->
@@ -669,39 +849,39 @@ body {
         <div class="main">
             <aside class="sidebar">
                 <div class="sidebar-block">
-                    <div class="sidebar-title">Категории</div>
+                    <div class="sidebar-title" data-i18n="categories">Категории</div>
                     <div id="sidebar-cats"></div>
                 </div>
                 <div class="sidebar-block">
-                    <div class="sidebar-title">Цена</div>
+                    <div class="sidebar-title" data-i18n="price">Цена</div>
                     <div class="sidebar-price-row">
-                        <input type="number" class="sidebar-price-input" placeholder="От" id="price-min">
-                        <input type="number" class="sidebar-price-input" placeholder="До" id="price-max">
+                        <input type="number" class="sidebar-price-input" placeholder="От" id="price-min" data-i18n-ph="price_from">
+                        <input type="number" class="sidebar-price-input" placeholder="До" id="price-max" data-i18n-ph="price_to">
                     </div>
-                    <button class="btn-primary" style="padding:10px;font-size:12px;" onclick="applyPriceFilter()">Применить</button>
+                    <button class="btn-primary" style="padding:10px;font-size:12px;" onclick="applyPriceFilter()" data-i18n="apply">Применить</button>
                 </div>
                 <div class="sidebar-block">
-                    <div class="sidebar-title">Сортировка</div>
+                    <div class="sidebar-title" data-i18n="sort">Сортировка</div>
                     <select class="sidebar-sort" id="sort-select" onchange="applySort()">
-                        <option value="default">По умолчанию</option>
-                        <option value="price-asc">Сначала дешёвые</option>
-                        <option value="price-desc">Сначала дорогие</option>
-                        <option value="name">По названию</option>
+                        <option value="default" data-i18n="sort_default">По умолчанию</option>
+                        <option value="price-asc" data-i18n="sort_price_asc">Сначала дешёвые</option>
+                        <option value="price-desc" data-i18n="sort_price_desc">Сначала дорогие</option>
+                        <option value="name" data-i18n="sort_name">По названию</option>
                     </select>
                 </div>
             </aside>
 
             <div class="content">
                 <div class="promo" onclick="copyRefLink()">
-                    <div class="promo-label">Реферальная программа</div>
-                    <div class="promo-title">Получайте 5% от покупок друзей</div>
-                    <div class="promo-text">Приглашайте друзей и зарабатывайте на их покупках</div>
+                    <div class="promo-label" data-i18n="ref_program">Реферальная программа</div>
+                    <div class="promo-title" data-i18n="ref_title">Получайте 5% от покупок друзей</div>
+                    <div class="promo-text" data-i18n="ref_text">Приглашайте друзей и зарабатывайте на их покупках</div>
                 </div>
 
                 <div class="cats-scroll" id="mobile-cats"></div>
 
                 <div class="page-head">
-                    <h2>Каталог</h2>
+                    <h2 data-i18n="catalog">Каталог</h2>
                     <span class="page-head-count" id="catalog-count">0 товаров</span>
                 </div>
 
@@ -716,7 +896,7 @@ body {
             <div class="content">
                 <button class="back-btn" onclick="showPage('catalog')">
                     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                    Назад
+                    <span data-i18n="back">Назад</span>
                 </button>
                 <div class="detail-layout">
                     <div class="gallery" id="gallery">
@@ -731,13 +911,19 @@ body {
                     </div>
                     <div class="detail-info">
                         <div class="detail-cat" id="detail-cat">БОТ</div>
+                        <div class="detail-badges" id="detail-badges"></div>
                         <h1 class="detail-name" id="detail-name"></h1>
                         <div class="detail-price" id="detail-price"></div>
                         <div id="balance-hint"></div>
                         <div class="detail-desc" id="detail-desc"></div>
                         <div id="balance-check-box"></div>
-                        <button class="btn-primary" id="buy-btn" onclick="openPayment()">Оплатить</button>
-                        <button class="btn-secondary" onclick="showPage('catalog')">Продолжить покупки</button>
+                        <button class="btn-primary" id="buy-btn" onclick="openPayment()" data-i18n="pay">Оплатить</button>
+                        <button class="btn-secondary" onclick="showPage('catalog')" data-i18n="continue_shopping">Продолжить покупки</button>
+
+                        <div style="margin-top:20px;">
+                            <div class="sidebar-title" data-i18n="reviews">Отзывы</div>
+                            <div id="product-reviews" class="reviews-list"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -749,9 +935,22 @@ body {
         <div class="main">
             <div class="content">
                 <div class="page-head">
-                    <h2>Уровень</h2>
+                    <h2 data-i18n="level">Уровень</h2>
                 </div>
                 <div id="level-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="page" id="page-reviews">
+        <div class="main">
+            <div class="content">
+                <div class="page-head">
+                    <h2 data-i18n="reviews">Отзывы</h2>
+                    <span class="page-head-count" id="reviews-count">0</span>
+                </div>
+                <div id="reviews-list" class="reviews-list"></div>
             </div>
         </div>
     </div>
@@ -761,7 +960,7 @@ body {
         <div class="main">
             <div class="content">
                 <div class="page-head">
-                    <h2>Избранное</h2>
+                    <h2 data-i18n="favorites">Избранное</h2>
                     <span class="page-head-count" id="fav-count">0</span>
                 </div>
                 <div class="grid" id="fav-grid"></div>
@@ -774,7 +973,7 @@ body {
         <div class="main">
             <div class="content">
                 <div class="page-head">
-                    <h2>Мои заказы</h2>
+                    <h2 data-i18n="my_orders">Мои заказы</h2>
                     <span class="page-head-count" id="orders-count">0</span>
                 </div>
                 <div class="orders-list" id="orders-list"></div>
@@ -787,7 +986,7 @@ body {
         <div class="main">
             <div class="content">
                 <div class="page-head">
-                    <h2>Профиль</h2>
+                    <h2 data-i18n="profile">Профиль</h2>
                 </div>
 
                 <div class="profile-card">
@@ -801,59 +1000,66 @@ body {
                     </div>
                     <div class="profile-stats">
                         <div class="profile-stat">
-                            <div class="profile-stat-label">Покупок</div>
+                            <div class="profile-stat-label" data-i18n="purchases">Покупок</div>
                             <div class="profile-stat-value" id="stat-purchases">0</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="profile-stat-label">Баланс</div>
+                            <div class="profile-stat-label" data-i18n="balance">Баланс</div>
                             <div class="profile-stat-value green" id="stat-balance">0 ₽</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="profile-stat-label">Уровень</div>
+                            <div class="profile-stat-label" data-i18n="level">Уровень</div>
                             <div class="profile-stat-value" id="stat-level">1</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="promo-card referral" onclick="copyRefLink()">
-                    <div class="promo-card-label">Реферальная программа</div>
-                    <div class="promo-card-title">Получайте 5% от покупок друзей</div>
+                    <div class="promo-card-label" data-i18n="ref_program">Реферальная программа</div>
+                    <div class="promo-card-title" data-i18n="ref_title">Получайте 5% от покупок друзей</div>
                     <div class="promo-card-text" id="ref-link-text">t.me/QuickMarketRobot?start=ref_...</div>
                 </div>
 
                 <div class="profile-menu">
+                    <div class="profile-menu-item" onclick="openBalancePromoModal()">
+                        <div class="profile-menu-left">
+                            <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 010-4h12v4"/><path d="M4 6v12a2 2 0 002 2h14v-4"/><path d="M18 12a2 2 0 000 4h4v-4z"/></svg></div>
+                            <span data-i18n="activate_promo">Активировать промокод</span>
+                        </div>
+                        <div class="profile-menu-arrow">›</div>
+                    </div>
                     <div class="profile-menu-item" onclick="showPage('level')">
                         <div class="profile-menu-left">
                             <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-                            Мой уровень
+                            <span data-i18n="my_level">Мой уровень</span>
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
                     <div class="profile-menu-item" onclick="showPage('orders')">
                         <div class="profile-menu-left">
                             <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-                            Мои заказы
+                            <span data-i18n="my_orders">Мои заказы</span>
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
                     <div class="profile-menu-item" onclick="showPage('favorites')">
                         <div class="profile-menu-left">
                             <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
-                            Избранное
+                            <span data-i18n="favorites">Избранное</span>
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
                     <div class="profile-menu-item" onclick="openSupport()">
                         <div class="profile-menu-left">
                             <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
-                            Поддержка
+                            <span data-i18n="support">Поддержка</span>
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
                     <div class="profile-menu-item" id="admin-menu-item" onclick="showPage('admin')">
                         <div class="profile-menu-left">
                             <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.1.4.38.75.75.91.37.16.8.14 1.16-.06l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 15z"/></svg></div>
-                            Админ-панель
+                            <span data-i18n="admin">Админ-панель</span>
                         </div>
                         <div class="profile-menu-arrow">›</div>
                     </div>
@@ -867,11 +1073,39 @@ body {
         <div class="main">
             <div class="content">
                 <div class="page-head">
-                    <h2>Админ-панель</h2>
+                    <h2 data-i18n="admin">Админ-панель</h2>
                 </div>
-                <button class="btn-primary" onclick="openAddProduct()" style="margin-bottom:20px;">+ Добавить товар</button>
-                <div id="admin-list"></div>
-                <button class="btn-secondary" onclick="showPage('catalog')">← Назад в каталог</button>
+
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="products" data-i18n="products">Товары</button>
+                    <button class="admin-tab" data-tab="stats" data-i18n="stats">Статистика</button>
+                    <button class="admin-tab" data-tab="promos" data-i18n="promos">Промокоды</button>
+                    <button class="admin-tab" data-tab="reviews" data-i18n="reviews">Отзывы</button>
+                </div>
+
+                <!-- Products tab -->
+                <div id="admin-tab-products">
+                    <button class="btn-primary" onclick="openAddProduct()" style="margin-bottom:20px;" data-i18n="add_product">+ Добавить товар</button>
+                    <div id="admin-list"></div>
+                </div>
+
+                <!-- Stats tab -->
+                <div id="admin-tab-stats" style="display:none;">
+                    <div id="admin-stats-content"></div>
+                </div>
+
+                <!-- Promos tab -->
+                <div id="admin-tab-promos" style="display:none;">
+                    <button class="btn-primary" onclick="openAddPromo()" style="margin-bottom:20px;" data-i18n="add_promo">+ Создать промокод</button>
+                    <div id="admin-promos-list"></div>
+                </div>
+
+                <!-- Reviews tab -->
+                <div id="admin-tab-reviews" style="display:none;">
+                    <div id="admin-reviews-list"></div>
+                </div>
+
+                <button class="btn-secondary" onclick="showPage('catalog')" style="margin-top:20px;" data-i18n="back_to_catalog">← Назад в каталог</button>
             </div>
         </div>
     </div>
@@ -880,19 +1114,19 @@ body {
     <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-btn active" data-page="catalog">
             <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Главная</span>
+            <span data-i18n="nav_home">Главная</span>
         </button>
         <button class="nav-btn" data-page="level">
             <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            <span>Level</span>
+            <span data-i18n="nav_level">Level</span>
         </button>
         <button class="nav-btn" data-page="orders">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Заказы</span>
+            <span data-i18n="nav_orders">Заказы</span>
         </button>
         <button class="nav-btn" data-page="profile">
             <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Профиль</span>
+            <span data-i18n="nav_profile">Профиль</span>
         </button>
     </nav>
 </div>
@@ -902,10 +1136,10 @@ body {
 <!-- MODALS -->
 <div class="modal-overlay" id="support-modal">
     <div class="modal">
-        <h3>Поддержка</h3>
-        <p>Есть вопрос? Пишите нам!</p>
-        <a href="https://t.me/qmarket_support" target="_blank" class="btn-primary" style="text-decoration:none;display:block;">Написать в поддержку</a>
-        <button class="btn-secondary" onclick="closeModal('support-modal')">Закрыть</button>
+        <h3 data-i18n="support">Поддержка</h3>
+        <p data-i18n="support_text">Есть вопрос? Пишите нам!</p>
+        <a href="https://t.me/qmarket_support" target="_blank" class="btn-primary" style="text-decoration:none;display:block;" data-i18n="write_support">Написать в поддержку</a>
+        <button class="btn-secondary" onclick="closeModal('support-modal')" data-i18n="close">Закрыть</button>
     </div>
 </div>
 
@@ -923,10 +1157,48 @@ body {
     </div>
 </div>
 
+<div class="modal-overlay" id="order-modal">
+    <div class="modal">
+        <h3 id="order-modal-title">Заказ</h3>
+        <div id="order-modal-content" style="text-align:left;"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="balance-promo-modal">
+    <div class="modal">
+        <h3 data-i18n="activate_promo">Активировать промокод</h3>
+        <p data-i18n="balance_promo_hint">Введите промокод для пополнения баланса</p>
+        <div class="promo-input-row">
+            <input class="promo-input" id="balance-promo-input" placeholder="PROMOCODE">
+            <button class="promo-apply-btn" onclick="applyBalancePromo()" data-i18n="apply">OK</button>
+        </div>
+        <div id="balance-promo-result"></div>
+        <button class="btn-secondary" onclick="closeModal('balance-promo-modal')" data-i18n="close">Закрыть</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="review-modal">
+    <div class="modal">
+        <h3 data-i18n="leave_review">Оставить отзыв</h3>
+        <div class="star-input" id="star-input">
+            <span class="star" data-star="1">★</span>
+            <span class="star" data-star="2">★</span>
+            <span class="star" data-star="3">★</span>
+            <span class="star" data-star="4">★</span>
+            <span class="star" data-star="5">★</span>
+        </div>
+        <div class="form-group">
+            <textarea class="form-textarea" id="review-text" placeholder="Ваш отзыв..." rows="4"></textarea>
+        </div>
+        <button class="btn-primary" onclick="submitReview()" data-i18n="send">Отправить</button>
+        <button class="btn-secondary" onclick="closeModal('review-modal')" data-i18n="close">Закрыть</button>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ========== TELEGRAM INIT ==========
+// ========== TELEGRAM ==========
 const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
@@ -934,7 +1206,7 @@ if (tg) {
     if (tg.requestFullscreen) tg.requestFullscreen();
     tg.setHeaderColor('#0a0a0f');
     tg.setBackgroundColor('#0a0a0f');
-    tg.setBottomBarColor('#0a0a0f');
+    if (tg.setBottomBarColor) tg.setBottomBarColor('#0a0a0f');
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
     if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
 }
@@ -944,6 +1216,101 @@ const ADMIN_ID = 5640325235;
 const user = tg?.initDataUnsafe?.user || { first_name: 'Гость', username: 'guest', id: 0, photo_url: '' };
 const isAdmin = user.id === ADMIN_ID;
 
+// ========== I18N ==========
+const i18n = {
+    ru: {
+        nav_catalog: 'Каталог', nav_level: 'Level', nav_orders: 'Заказы', nav_favorites: 'Избранное',
+        nav_reviews: 'Отзывы', nav_home: 'Главная', nav_profile: 'Профиль',
+        search_placeholder: 'Поиск товаров...',
+        categories: 'Категории', price: 'Цена', sort: 'Сортировка',
+        price_from: 'От', price_to: 'До', apply: 'Применить',
+        sort_default: 'По умолчанию', sort_price_asc: 'Сначала дешёвые',
+        sort_price_desc: 'Сначала дорогие', sort_name: 'По названию',
+        ref_program: 'Реферальная программа', ref_title: 'Получайте 5% от покупок друзей',
+        ref_text: 'Приглашайте друзей и зарабатывайте на их покупках',
+        catalog: 'Каталог', back: 'Назад', pay: 'Оплатить', continue_shopping: 'Продолжить покупки',
+        level: 'Уровень', reviews: 'Отзывы', favorites: 'Избранное', my_orders: 'Мои заказы',
+        profile: 'Профиль', purchases: 'Покупок', balance: 'Баланс',
+        activate_promo: 'Активировать промокод', balance_promo_hint: 'Введите промокод для пополнения баланса',
+        my_level: 'Мой уровень', support: 'Поддержка', admin: 'Админ-панель',
+        products: 'Товары', stats: 'Статистика', promos: 'Промокоды',
+        add_product: '+ Добавить товар', add_promo: '+ Создать промокод',
+        back_to_catalog: '← Назад в каталог', close: 'Закрыть',
+        support_text: 'Есть вопрос? Пишите нам!', write_support: 'Написать в поддержку',
+        leave_review: 'Оставить отзыв', send: 'Отправить',
+        promo_placeholder: 'Промокод', promo_invalid: 'Промокод не найден',
+        promo_applied: 'Промокод применён',
+        copy: 'Копировать', open: 'Открыть',
+        link_copied: 'Ссылка скопирована',
+        ref_copied: 'Реферальная ссылка скопирована',
+        no_products: 'Ничего не найдено', no_products_sub: 'Попробуйте изменить запрос',
+        no_fav: 'Пусто', no_fav_sub: 'Добавляйте товары в избранное',
+        no_orders: 'Нет заказов', no_orders_sub: 'Купите первый товар',
+        no_reviews: 'Пока нет отзывов',
+        order_waiting: 'Ожидание', order_completed: 'Выполнен', order_cancelled: 'Отменён'
+    },
+    en: {
+        nav_catalog: 'Catalog', nav_level: 'Level', nav_orders: 'Orders', nav_favorites: 'Favorites',
+        nav_reviews: 'Reviews', nav_home: 'Home', nav_profile: 'Profile',
+        search_placeholder: 'Search products...',
+        categories: 'Categories', price: 'Price', sort: 'Sort',
+        price_from: 'From', price_to: 'To', apply: 'Apply',
+        sort_default: 'Default', sort_price_asc: 'Cheapest first',
+        sort_price_desc: 'Most expensive first', sort_name: 'By name',
+        ref_program: 'Referral program', ref_title: 'Get 5% from friends purchases',
+        ref_text: 'Invite friends and earn from their purchases',
+        catalog: 'Catalog', back: 'Back', pay: 'Pay', continue_shopping: 'Continue shopping',
+        level: 'Level', reviews: 'Reviews', favorites: 'Favorites', my_orders: 'My orders',
+        profile: 'Profile', purchases: 'Purchases', balance: 'Balance',
+        activate_promo: 'Activate promo code', balance_promo_hint: 'Enter promo code to top up balance',
+        my_level: 'My level', support: 'Support', admin: 'Admin panel',
+        products: 'Products', stats: 'Stats', promos: 'Promo codes',
+        add_product: '+ Add product', add_promo: '+ Create promo',
+        back_to_catalog: '← Back to catalog', close: 'Close',
+        support_text: 'Have a question? Write to us!', write_support: 'Contact support',
+        leave_review: 'Leave a review', send: 'Send',
+        promo_placeholder: 'Promo code', promo_invalid: 'Promo code not found',
+        promo_applied: 'Promo applied',
+        copy: 'Copy', open: 'Open',
+        link_copied: 'Link copied',
+        ref_copied: 'Referral link copied',
+        no_products: 'Nothing found', no_products_sub: 'Try changing query',
+        no_fav: 'Empty', no_fav_sub: 'Add products to favorites',
+        no_orders: 'No orders', no_orders_sub: 'Buy your first product',
+        no_reviews: 'No reviews yet',
+        order_waiting: 'Waiting', order_completed: 'Completed', order_cancelled: 'Cancelled'
+    }
+};
+
+let currentLang = localStorage.getItem('qm_lang') || (user.language_code?.startsWith('en') ? 'en' : 'ru');
+const t = (key) => i18n[currentLang][key] || key;
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.dataset.i18nPh;
+        if (i18n[currentLang][key]) el.placeholder = i18n[currentLang][key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === currentLang);
+    });
+}
+
+function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('qm_lang', lang);
+    applyTranslations();
+    renderAll();
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+
 // ========== STATE ==========
 let products = [];
 let activeCat = 'all';
@@ -952,13 +1319,18 @@ let priceMin = null;
 let priceMax = null;
 let sortMode = 'default';
 let favorites = JSON.parse(localStorage.getItem('qm_fav') || '[]');
-let orders = JSON.parse(localStorage.getItem('qm_orders') || '[]');
 let userData = { points: 0, level: 1, balance: 0, purchases: 0, cashbackEarned: 0, referralEarnings: 0, referralsCount: 0 };
+let orders = [];
+let allReviews = [];
 let currentProduct = null;
 let currentSlide = 0;
 let slideCount = 0;
 let selectedPayMethod = '2';
 let useBalanceChecked = false;
+let appliedPromo = null;
+let reviewTarget = null;
+let selectedRating = 0;
+let adminTab = 'products';
 
 // ========== LOADER ==========
 const loaderFill = document.getElementById('loader-fill');
@@ -970,10 +1342,10 @@ const loaderInterval = setInterval(() => {
     progress += Math.random() * 10 + 3;
     if (progress > 92) progress = 92;
     loaderFill.style.width = progress + '%';
-    if (progress < 25) loaderStatus.textContent = 'Подключение...';
-    else if (progress < 55) loaderStatus.textContent = 'Загрузка товаров...';
-    else if (progress < 85) loaderStatus.textContent = 'Загрузка профиля...';
-    else loaderStatus.textContent = 'Почти готово...';
+    if (progress < 25) loaderStatus.textContent = currentLang === 'ru' ? 'Подключение...' : 'Connecting...';
+    else if (progress < 55) loaderStatus.textContent = currentLang === 'ru' ? 'Загрузка товаров...' : 'Loading products...';
+    else if (progress < 85) loaderStatus.textContent = currentLang === 'ru' ? 'Загрузка профиля...' : 'Loading profile...';
+    else loaderStatus.textContent = currentLang === 'ru' ? 'Почти готово...' : 'Almost done...';
 }, 100);
 
 // ========== API ==========
@@ -1020,36 +1392,44 @@ async function loadUser() {
     }
 }
 
+async function loadOrders() {
+    try {
+        const data = await apiGet(`/orders/list?userId=${user.id}`);
+        orders = data.orders || [];
+    } catch (e) {
+        orders = [];
+    }
+}
+
+async function loadReviews() {
+    try {
+        const data = await apiGet('/reviews/list');
+        allReviews = data.reviews || [];
+    } catch (e) {
+        allReviews = [];
+    }
+}
+
 // ========== INIT ==========
 async function init() {
     await loadProducts();
     await loadUser();
-    cleanOldOrders();
+    await loadOrders();
+    await loadReviews();
 
     progress = 100;
     loaderFill.style.width = '100%';
-    loaderStatus.textContent = 'Готово!';
+    loaderStatus.textContent = currentLang === 'ru' ? 'Готово!' : 'Done!';
 
     setTimeout(() => {
         clearInterval(loaderInterval);
         loader.classList.add('hidden');
+        applyTranslations();
         renderAll();
         if (isAdmin) document.getElementById('admin-menu-item').classList.add('visible');
         checkDeepLink();
         checkReferral();
     }, 400);
-}
-
-// ========== CLEAN OLD ORDERS ==========
-function cleanOldOrders() {
-    const now = Date.now();
-    const before = orders.length;
-    orders = orders.filter(o => {
-        if (o.status !== 'waiting') return true;
-        if (!o.createdAt) return false;
-        return (now - o.createdAt) < 5 * 60 * 1000;
-    });
-    if (orders.length !== before) saveOrders();
 }
 
 // ========== DEEP LINK ==========
@@ -1064,7 +1444,6 @@ function checkDeepLink() {
     }
 }
 
-// ========== REFERRAL ==========
 async function checkReferral() {
     const param = tg?.initDataUnsafe?.start_param;
     if (param && param.startsWith('ref_')) {
@@ -1085,14 +1464,15 @@ function renderAll() {
     renderOrders();
     renderProfile();
     renderLevel();
+    renderReviewsPage();
     updateCounts();
 }
 
 function updateCounts() {
-    document.getElementById('catalog-count').textContent = filteredProducts().length + ' товаров';
+    document.getElementById('catalog-count').textContent = filteredProducts().length + ' ' + (currentLang === 'ru' ? 'товаров' : 'items');
     document.getElementById('fav-count').textContent = favorites.length;
-    const userOrders = orders.filter(o => o.userId === user.id);
-    document.getElementById('orders-count').textContent = userOrders.length + ' заказов';
+    document.getElementById('orders-count').textContent = orders.length + ' ' + (currentLang === 'ru' ? 'заказов' : 'orders');
+    document.getElementById('reviews-count').textContent = allReviews.length;
 }
 
 function filteredProducts() {
@@ -1110,7 +1490,9 @@ function filteredProducts() {
 
 function renderCats() {
     const cats = ['all', ...new Set(products.map(p => p.type || 'other'))];
-    const labels = { all: 'Все', bot: 'Боты', webapp: 'WebApp', other: 'Другое' };
+    const labels = currentLang === 'ru'
+        ? { all: 'Все', bot: 'Боты', webapp: 'WebApp', other: 'Другое' }
+        : { all: 'All', bot: 'Bots', webapp: 'WebApp', other: 'Other' };
 
     const mobileCats = document.getElementById('mobile-cats');
     mobileCats.innerHTML = cats.map(cat =>
@@ -1147,14 +1529,29 @@ function applySort() {
     renderGrid();
 }
 
+function badgesHTML(badges) {
+    if (!badges || !badges.length) return '';
+    const map = {
+        hit: { label: currentLang === 'ru' ? 'Хит' : 'Hot', cls: 'badge-hit' },
+        new: { label: 'NEW', cls: 'badge-new' },
+        discount: { label: currentLang === 'ru' ? 'Скидка' : 'Sale', cls: 'badge-discount' },
+        recommended: { label: currentLang === 'ru' ? 'Рекомендуем' : 'Recommended', cls: 'badge-recommended' }
+    };
+    return `<div class="card-badges">${badges.map(b => {
+        const info = map[b];
+        if (!info) return '';
+        return `<span class="badge-chip ${info.cls}">${info.label}</span>`;
+    }).join('')}</div>`;
+}
+
 function renderGrid() {
     const grid = document.getElementById('grid');
     const filtered = filteredProducts();
     if (filtered.length === 0) {
         grid.innerHTML = `<div class="empty">
             <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
-            <div class="empty-title">Ничего не найдено</div>
-            <div class="empty-text">Попробуйте изменить запрос или категорию</div>
+            <div class="empty-title">${t('no_products')}</div>
+            <div class="empty-text">${t('no_products_sub')}</div>
         </div>`;
         return;
     }
@@ -1164,19 +1561,23 @@ function renderGrid() {
 function cardHTML(p, index = 0) {
     const isFav = favorites.includes(p.id);
     const typeLabel = p.type === 'webapp' ? 'WEBAPP' : p.type === 'bot' ? 'БОТ' : 'ТОВАР';
+    const name = currentLang === 'en' && p.name_en ? p.name_en : p.name;
+
     const imgHTML = p.images && p.images[0]
         ? `<img src="${p.images[0]}" class="card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="card-img-ph" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
         : `<div class="card-img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
     return `<div class="card" style="animation-delay:${index * 0.03}s" onclick="openProduct(${p.id})">
         <div style="position:relative">
             ${imgHTML}
             <div class="card-badge">${typeLabel}</div>
+            ${badgesHTML(p.badges)}
             <button class="card-fav ${isFav ? 'active' : ''}" onclick="event.stopPropagation();toggleFav(${p.id})">
                 <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
             </button>
         </div>
         <div class="card-body">
-            <div class="card-name">${p.name}</div>
+            <div class="card-name">${name}</div>
             <div class="card-bottom">
                 <div class="card-price">${p.price} ₽</div>
                 <button class="card-cart" onclick="event.stopPropagation();quickAdd(${p.id})">
@@ -1193,8 +1594,8 @@ function renderFav() {
     if (favs.length === 0) {
         grid.innerHTML = `<div class="empty">
             <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
-            <div class="empty-title">Пусто</div>
-            <div class="empty-text">Добавляйте товары в избранное</div>
+            <div class="empty-title">${t('no_fav')}</div>
+            <div class="empty-text">${t('no_fav_sub')}</div>
         </div>`;
         return;
     }
@@ -1203,33 +1604,95 @@ function renderFav() {
 
 function renderOrders() {
     const list = document.getElementById('orders-list');
-    const userOrders = orders.filter(o => String(o.userId) === String(user.id));
-    if (userOrders.length === 0) {
+    if (orders.length === 0) {
         list.innerHTML = `<div class="empty">
             <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-            <div class="empty-title">Нет заказов</div>
-            <div class="empty-text">Купите первый товар</div>
+            <div class="empty-title">${t('no_orders')}</div>
+            <div class="empty-text">${t('no_orders_sub')}</div>
         </div>`;
         return;
     }
-    list.innerHTML = userOrders.map(o => {
+    list.innerHTML = orders.map(o => {
         const p = products.find(x => x.id === o.productId);
-        if (!p) return '';
+        const productName = p ? (currentLang === 'en' && p.name_en ? p.name_en : p.name) : 'Товар';
         const statusMap = {
-            waiting: { text: 'Ожидание', cls: 'waiting' },
-            completed: { text: 'Выполнен', cls: 'completed' },
-            cancelled: { text: 'Отменён', cls: 'cancelled' }
+            waiting: { text: t('order_waiting'), cls: 'waiting' },
+            completed: { text: t('order_completed'), cls: 'completed' },
+            cancelled: { text: t('order_cancelled'), cls: 'cancelled' }
         };
         const st = statusMap[o.status] || { text: o.status, cls: '' };
-        return `<div class="order-card">
+        const date = new Date(o.createdAt).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US');
+        return `<div class="order-card" onclick="openOrderModal('${o.orderId}')">
             <div class="order-header">
-                <div class="order-name">${p.name}</div>
+                <div class="order-name">${productName}</div>
                 <div class="order-badge ${st.cls}">${st.text}</div>
             </div>
-            <div class="order-price">${o.amount || p.price} ₽</div>
-            <div class="order-date">${o.date}</div>
+            <div class="order-price">${o.paidAmount || o.amount} ₽</div>
+            <div class="order-date">${date}</div>
         </div>`;
     }).join('');
+}
+
+async function openOrderModal(orderId) {
+    const order = orders.find(o => o.orderId === orderId);
+    if (!order) return;
+    const p = products.find(x => x.id === order.productId);
+    const productName = p ? (currentLang === 'en' && p.name_en ? p.name_en : p.name) : 'Товар';
+    const productImg = p && p.images && p.images[0] ? p.images[0] : null;
+
+    const statusMap = {
+        waiting: { text: t('order_waiting'), cls: 'waiting' },
+        completed: { text: t('order_completed'), cls: 'completed' },
+        cancelled: { text: t('order_cancelled'), cls: 'cancelled' }
+    };
+    const st = statusMap[order.status] || { text: order.status, cls: '' };
+    const date = new Date(order.createdAt).toLocaleString(currentLang === 'ru' ? 'ru-RU' : 'en-US');
+
+    document.getElementById('order-modal-title').textContent = 'Заказ #' + orderId.split('_').slice(-2).join('_');
+    document.getElementById('order-modal-content').innerHTML = `
+        ${productImg ? `<img src="${productImg}" class="order-detail-img" onerror="this.style.display='none'">` : ''}
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:900;margin-bottom:8px;">${productName}</div>
+            <div class="order-badge ${st.cls}" style="display:inline-block;">${st.text}</div>
+        </div>
+        <div class="order-detail-row">
+            <span class="order-detail-label">Сумма</span>
+            <span class="order-detail-value">${order.paidAmount || order.amount} ₽</span>
+        </div>
+        ${order.balanceUsed ? `<div class="order-detail-row">
+            <span class="order-detail-label">Списано с баланса</span>
+            <span class="order-detail-value green">−${order.balanceUsed} ₽</span>
+        </div>` : ''}
+        ${order.discount ? `<div class="order-detail-row">
+            <span class="order-detail-label">Скидка (${order.promoCode || ''})</span>
+            <span class="order-detail-value green">−${order.discount} ₽</span>
+        </div>` : ''}
+        <div class="order-detail-row">
+            <span class="order-detail-label">Дата</span>
+            <span class="order-detail-value">${date}</span>
+        </div>
+        ${order.transactionId ? `<div class="order-detail-row">
+            <span class="order-detail-label">TX ID</span>
+            <span class="order-detail-value" style="font-family:monospace;font-size:10px;">${order.transactionId}</span>
+        </div>` : ''}
+        <div style="display:flex;gap:8px;margin-top:16px;">
+            ${order.status === 'completed' && p && p.file ? `
+                <a href="${p.file}" target="_blank" class="btn-primary" style="text-decoration:none;text-align:center;display:block;flex:1;">
+                    Скачать товар
+                </a>
+            ` : ''}
+            <button class="btn-secondary" style="margin:0;flex:1;" onclick="openSupportForOrder('${orderId}')">
+                Поддержка
+            </button>
+        </div>
+        <button class="btn-secondary" onclick="closeModal('order-modal')">${t('close')}</button>
+    `;
+    document.getElementById('order-modal').classList.add('active');
+}
+
+function openSupportForOrder(orderId) {
+    const msg = encodeURIComponent('Здравствуйте! Вопрос по заказу ' + orderId);
+    window.open('https://t.me/qmarket_support?text=' + msg, '_blank');
 }
 
 function renderProfile() {
@@ -1268,63 +1731,58 @@ function renderLevel() {
     const balance = userData.balance || 0;
     const cashbackEarned = userData.cashbackEarned || 0;
 
-    // Прогресс: 100 очков = 1 уровень
     const currentLevelPoints = (level - 1) * 100;
     const progressInLevel = Math.max(0, points - currentLevelPoints);
     const progressPercent = level >= 50 ? 100 : Math.min(100, progressInLevel);
     const cashbackPercent = getCashbackPercent(level);
 
     const levelsData = [
-        { level: 1, percent: 0 },
-        { level: 5, percent: 1 },
-        { level: 10, percent: 3 },
-        { level: 15, percent: 4 },
-        { level: 20, percent: 5 },
-        { level: 25, percent: 7 },
-        { level: 30, percent: 8 },
-        { level: 35, percent: 9 },
-        { level: 50, percent: 10 }
+        { level: 1, percent: 0 }, { level: 5, percent: 1 }, { level: 10, percent: 3 },
+        { level: 15, percent: 4 }, { level: 20, percent: 5 }, { level: 25, percent: 7 },
+        { level: 30, percent: 8 }, { level: 35, percent: 9 }, { level: 50, percent: 10 }
     ];
+
+    const ru = currentLang === 'ru';
 
     content.innerHTML = `
         <div class="level-hero">
             <div class="level-hero-content">
                 <div class="level-number">${level}</div>
-                <div class="level-label">Уровень</div>
+                <div class="level-label">${ru ? 'Уровень' : 'Level'}</div>
                 <div class="level-progress-track">
                     <div class="level-progress-fill" style="width:${progressPercent}%"></div>
                 </div>
                 <div class="level-progress-text">
-                    ${level >= 50 ? 'Максимальный уровень!' : `${progressInLevel}/100 очков до ${level + 1} уровня`}
+                    ${level >= 50 ? (ru ? 'Максимальный уровень!' : 'Max level!') : `${progressInLevel}/100 ${ru ? 'очков до' : 'points to'} ${level + 1}`}
                 </div>
             </div>
         </div>
 
         <div class="level-stats">
             <div class="level-stat">
-                <div class="level-stat-label">Очков</div>
+                <div class="level-stat-label">${ru ? 'Очков' : 'Points'}</div>
                 <div class="level-stat-value">${points}</div>
-                <div class="level-stat-sub">всего накоплено</div>
+                <div class="level-stat-sub">${ru ? 'всего накоплено' : 'total'}</div>
             </div>
             <div class="level-stat">
-                <div class="level-stat-label">Покупок</div>
+                <div class="level-stat-label">${ru ? 'Покупок' : 'Purchases'}</div>
                 <div class="level-stat-value">${purchases}</div>
-                <div class="level-stat-sub">+50 очков за покупку</div>
+                <div class="level-stat-sub">${ru ? '+50 очков за покупку' : '+50 per purchase'}</div>
             </div>
             <div class="level-stat">
-                <div class="level-stat-label">Кешбек</div>
+                <div class="level-stat-label">${ru ? 'Кешбек' : 'Cashback'}</div>
                 <div class="level-stat-value accent">${cashbackPercent}%</div>
-                <div class="level-stat-sub">с покупок</div>
+                <div class="level-stat-sub">${ru ? 'с покупок' : 'from purchases'}</div>
             </div>
             <div class="level-stat">
-                <div class="level-stat-label">Заработано</div>
+                <div class="level-stat-label">${ru ? 'Заработано' : 'Earned'}</div>
                 <div class="level-stat-value green">${cashbackEarned} ₽</div>
-                <div class="level-stat-sub">с кешбека</div>
+                <div class="level-stat-sub">${ru ? 'с кешбека' : 'from cashback'}</div>
             </div>
         </div>
 
         <div class="cashback-levels">
-            <div class="cashback-levels-title">Уровни и кешбек</div>
+            <div class="cashback-levels-title">${ru ? 'Уровни и кешбек' : 'Levels & cashback'}</div>
             ${levelsData.map(l => {
                 const isCurrent = level >= l.level && (
                     !levelsData[levelsData.indexOf(l) + 1] ||
@@ -1338,32 +1796,114 @@ function renderLevel() {
         </div>
 
         <div class="level-stat" style="margin-bottom:0;">
-            <div class="level-stat-label">Текущий баланс</div>
+            <div class="level-stat-label">${ru ? 'Текущий баланс' : 'Current balance'}</div>
             <div class="level-stat-value green" style="font-size:32px;">${balance} ₽</div>
-            <div class="level-stat-sub" style="margin-top:8px;">Можно списать при покупке от 1300₽</div>
+            <div class="level-stat-sub" style="margin-top:8px;">${ru ? 'Можно списать при покупке от 1300₽' : 'Can be used on purchases from 1300₽'}</div>
         </div>
     `;
 }
 
-function renderAdmin() {
-    const list = document.getElementById('admin-list');
-    if (products.length === 0) {
-        list.innerHTML = '<div class="empty"><div class="empty-text">Товаров нет</div></div>';
+// ========== REVIEWS ==========
+function renderReviewsPage() {
+    const list = document.getElementById('reviews-list');
+    if (!list) return;
+    if (allReviews.length === 0) {
+        list.innerHTML = `<div class="empty">
+            <div class="empty-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div class="empty-title">${t('no_reviews')}</div>
+        </div>`;
         return;
     }
-    list.innerHTML = products.map(p => {
-        const img = p.images && p.images[0]
-            ? `<img src="${p.images[0]}" class="admin-item-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="admin-item-img ph" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`
-            : `<div class="admin-item-img ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
-        return `<div class="admin-item">
-            ${img}
-            <div class="admin-item-info">
-                <div class="admin-item-name">${p.name}</div>
-                <div class="admin-item-meta">${p.price} ₽ · ID ${p.id}</div>
+    list.innerHTML = allReviews.map(r => reviewCardHTML(r)).join('');
+}
+
+function reviewCardHTML(r) {
+    const p = products.find(x => x.id === r.productId);
+    const productName = p ? (currentLang === 'en' && p.name_en ? p.name_en : p.name) : '';
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const date = new Date(r.createdAt).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US');
+    return `<div class="review-card">
+        <div class="review-header">
+            <div class="review-author">
+                <div class="review-avatar">${(r.userName || '?')[0].toUpperCase()}</div>
+                <div>
+                    <div class="review-name">${r.userName || 'User'}</div>
+                    <div class="review-date">${date}</div>
+                </div>
             </div>
-            <button class="admin-del" onclick="deleteProduct(${p.id})">Удалить</button>
-        </div>`;
-    }).join('');
+            <div class="review-stars">${stars}</div>
+        </div>
+        <div class="review-text">${r.text || ''}</div>
+        ${productName ? `<div class="review-product">${currentLang === 'ru' ? 'Товар' : 'Product'}: ${productName}</div>` : ''}
+    </div>`;
+}
+
+function renderProductReviews(productId) {
+    const container = document.getElementById('product-reviews');
+    if (!container) return;
+    const reviews = allReviews.filter(r => r.productId === productId && r.status === 'approved');
+    
+    if (reviews.length === 0) {
+        container.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">${t('no_reviews')}</div>`;
+        return;
+    }
+    
+    container.innerHTML = reviews.slice(0, 3).map(r => reviewCardHTML(r)).join('');
+    
+    if (reviews.length > 3) {
+        container.innerHTML += `<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px;">+${reviews.length - 3}</div>`;
+    }
+}
+
+async function openReviewModal(productId) {
+    const check = await apiGet(`/reviews/can-leave?userId=${user.id}&productId=${productId}`);
+    if (!check.canLeave) {
+        if (check.alreadyReviewed) showToast('Вы уже оставили отзыв', 'error');
+        else showToast('Отзыв можно оставить только после покупки', 'error');
+        return;
+    }
+    reviewTarget = productId;
+    selectedRating = 0;
+    document.getElementById('review-text').value = '';
+    updateStars();
+    document.getElementById('review-modal').classList.add('active');
+}
+
+function updateStars() {
+    document.querySelectorAll('#star-input .star').forEach(s => {
+        s.classList.toggle('active', Number(s.dataset.star) <= selectedRating);
+    });
+}
+
+document.querySelectorAll('#star-input .star').forEach(s => {
+    s.addEventListener('click', () => {
+        selectedRating = Number(s.dataset.star);
+        updateStars();
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    });
+});
+
+async function submitReview() {
+    if (!selectedRating) { showToast('Поставьте оценку', 'error'); return; }
+    const text = document.getElementById('review-text').value.trim();
+    
+    try {
+        const data = await apiPost('/reviews/add', {
+            userId: String(user.id),
+            userName: user.first_name || 'User',
+            productId: reviewTarget,
+            rating: selectedRating,
+            text: text
+        });
+        
+        if (data.error) { showToast(data.error, 'error'); return; }
+        
+        showToast('Отзыв отправлен на модерацию', 'success');
+        closeModal('review-modal');
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    } catch (e) {
+        showToast('Ошибка', 'error');
+    }
 }
 
 // ========== FAVORITES ==========
@@ -1371,15 +1911,12 @@ function toggleFav(id) {
     const i = favorites.indexOf(id);
     if (i > -1) favorites.splice(i, 1);
     else favorites.push(id);
-    saveFav();
+    localStorage.setItem('qm_fav', JSON.stringify(favorites));
     renderGrid();
     renderFav();
     updateCounts();
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
-
-function saveFav() { localStorage.setItem('qm_fav', JSON.stringify(favorites)); }
-function saveOrders() { localStorage.setItem('qm_orders', JSON.stringify(orders)); }
 
 function quickAdd(id) {
     openProduct(id);
@@ -1393,23 +1930,45 @@ function openProduct(id) {
     currentProduct = p;
     currentSlide = 0;
     useBalanceChecked = false;
+    appliedPromo = null;
+
+    const name = currentLang === 'en' && p.name_en ? p.name_en : p.name;
+    const desc = currentLang === 'en' && p.description_en ? p.description_en : (p.description || '');
 
     document.getElementById('detail-cat').textContent = p.type === 'webapp' ? 'WEBAPP' : 'БОТ';
-    document.getElementById('detail-name').textContent = p.name;
+    document.getElementById('detail-name').textContent = name;
     document.getElementById('detail-price').textContent = p.price + ' ₽';
-    document.getElementById('detail-desc').innerHTML = (p.description || '').replace(/\n/g, '<br>');
+    document.getElementById('detail-desc').innerHTML = desc.replace(/\n/g, '<br>');
 
+    // Бейджи
+    const badgesEl = document.getElementById('detail-badges');
+    if (p.badges && p.badges.length) {
+        const map = {
+            hit: { label: currentLang === 'ru' ? 'Хит' : 'Hot', cls: 'badge-hit' },
+            new: { label: 'NEW', cls: 'badge-new' },
+            discount: { label: currentLang === 'ru' ? 'Скидка' : 'Sale', cls: 'badge-discount' },
+            recommended: { label: currentLang === 'ru' ? 'Рекомендуем' : 'Recommended', cls: 'badge-recommended' }
+        };
+        badgesEl.innerHTML = p.badges.map(b => {
+            const info = map[b];
+            return info ? `<span class="badge-chip ${info.cls}">${info.label}</span>` : '';
+        }).join('');
+    } else {
+        badgesEl.innerHTML = '';
+    }
+
+    // Баланс
     const balanceHint = document.getElementById('balance-hint');
     const balanceCheckBox = document.getElementById('balance-check-box');
 
     if (p.price > 1300 && userData.balance > 0) {
-        balanceHint.innerHTML = `<div class="detail-balance-hint">У вас на балансе ${userData.balance} ₽</div>`;
+        balanceHint.innerHTML = `<div class="detail-balance-hint">${currentLang === 'ru' ? 'У вас на балансе' : 'Your balance'}: ${userData.balance} ₽</div>`;
         balanceCheckBox.innerHTML = `
             <div class="balance-check" onclick="toggleBalanceCheck()">
                 <input type="checkbox" id="use-balance-check" onchange="toggleBalanceCheck()">
                 <div class="balance-check-info">
-                    <div class="balance-check-title">Списать с баланса</div>
-                    <div class="balance-check-sub">Итоговая цена: ${Math.max(0, p.price - userData.balance)} ₽</div>
+                    <div class="balance-check-title">${currentLang === 'ru' ? 'Списать с баланса' : 'Use balance'}</div>
+                    <div class="balance-check-sub">${currentLang === 'ru' ? 'Итоговая цена' : 'Final price'}: ${Math.max(0, p.price - userData.balance)} ₽</div>
                 </div>
             </div>
         `;
@@ -1418,6 +1977,7 @@ function openProduct(id) {
         balanceCheckBox.innerHTML = '';
     }
 
+    // Галерея
     const track = document.getElementById('gallery-track');
     const dots = document.getElementById('gallery-dots');
     const images = p.images && p.images.length > 0 ? p.images : [];
@@ -1433,6 +1993,10 @@ function openProduct(id) {
     }
 
     track.style.transform = 'translateX(0)';
+
+    // Отзывы товара
+    renderProductReviews(id);
+
     showPage('detail');
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
@@ -1456,11 +2020,20 @@ function shiftSlide(dir) {
 // ========== PAYMENT ==========
 function openPayment() {
     if (!currentProduct) return;
+    appliedPromo = null;
     const modal = document.getElementById('payment-modal');
-    document.getElementById('pay-title').textContent = `Оплата · ${currentProduct.price} ₽`;
+    const name = currentLang === 'en' && currentProduct.name_en ? currentProduct.name_en : currentProduct.name;
+    document.getElementById('pay-title').textContent = `${t('pay')} · ${currentProduct.price} ₽`;
     document.getElementById('pay-content').innerHTML = `
-        <p>${currentProduct.name}</p>
-        ${useBalanceChecked ? `<p style="color:var(--green);font-weight:700;">Списание с баланса: −${Math.min(userData.balance, currentProduct.price)} ₽</p>` : ''}
+        <p>${name}</p>
+        ${useBalanceChecked ? `<p style="color:var(--green);font-weight:700;">${currentLang === 'ru' ? 'Списание с баланса' : 'Balance used'}: −${Math.min(userData.balance, currentProduct.price)} ₽</p>` : ''}
+        
+        <div class="promo-input-row">
+            <input class="promo-input" id="promo-input" placeholder="${t('promo_placeholder')}">
+            <button class="promo-apply-btn" onclick="applyPromo()">OK</button>
+        </div>
+        <div id="promo-result"></div>
+        
         <div class="pay-list">
             <label class="pay-item">
                 <input type="radio" name="pay" value="2" checked onchange="selectedPayMethod='2'">
@@ -1472,88 +2045,119 @@ function openPayment() {
             <label class="pay-item">
                 <input type="radio" name="pay" value="11" onchange="selectedPayMethod='11'">
                 <div class="pay-item-info">
-                    <div class="pay-item-title">Банковская карта</div>
+                    <div class="pay-item-title">${currentLang === 'ru' ? 'Банковская карта' : 'Bank card'}</div>
                     <div class="pay-item-desc">МИР, Visa, Mastercard</div>
                 </div>
             </label>
             <label class="pay-item">
                 <input type="radio" name="pay" value="13" onchange="selectedPayMethod='13'">
                 <div class="pay-item-info">
-                    <div class="pay-item-title">Криптовалюта</div>
-                    <div class="pay-item-desc">USDT и другие</div>
+                    <div class="pay-item-title">${currentLang === 'ru' ? 'Криптовалюта' : 'Crypto'}</div>
+                    <div class="pay-item-desc">USDT</div>
                 </div>
             </label>
         </div>
-        <button class="btn-primary" onclick="createPayment()">Создать ссылку на оплату</button>
-        <button class="btn-secondary" onclick="closeModal('payment-modal')">Отмена</button>
+        <button class="btn-primary" onclick="createPayment()">${currentLang === 'ru' ? 'Создать ссылку на оплату' : 'Create payment link'}</button>
+        <button class="btn-secondary" onclick="closeModal('payment-modal')">${t('close')}</button>
     `;
     modal.classList.add('active');
+}
+
+async function applyPromo() {
+    const code = document.getElementById('promo-input').value.trim().toUpperCase();
+    const result = document.getElementById('promo-result');
+    if (!code) { result.innerHTML = ''; return; }
+    
+    const data = await apiPost('/promo/check', { code, type: 'percent' });
+    
+    if (!data.valid) {
+        result.innerHTML = `<div class="promo-error">${data.error}</div>`;
+        appliedPromo = null;
+        return;
+    }
+    
+    appliedPromo = data.promo.code;
+    const discount = Math.floor(currentProduct.price * data.promo.value / 100);
+    result.innerHTML = `<div class="promo-applied">
+        <span class="promo-applied-text">${t('promo_applied')}: −${data.promo.value}% (−${discount} ₽)</span>
+        <button class="promo-applied-remove" onclick="removePromo()">×</button>
+    </div>`;
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
+
+function removePromo() {
+    appliedPromo = null;
+    document.getElementById('promo-input').value = '';
+    document.getElementById('promo-result').innerHTML = '';
 }
 
 async function createPayment() {
     if (!currentProduct) return;
     const content = document.getElementById('pay-content');
-    content.innerHTML = '<p style="padding:30px 0;text-align:center;">Создаём ссылку...</p>';
+    content.innerHTML = '<p style="padding:30px 0;text-align:center;">' + (currentLang === 'ru' ? 'Создаём ссылку...' : 'Creating link...') + '</p>';
 
     try {
-        const orderId = `order_${Date.now()}_${currentProduct.id}_${user.id}`;
         const data = await apiPost('/create-payment', {
             productId: currentProduct.id,
             userId: String(user.id),
             userName: user.username ? '@' + user.username : (user.first_name || ''),
             paymentMethod: selectedPayMethod,
-            useBalance: useBalanceChecked
+            useBalance: useBalanceChecked,
+            promoCode: appliedPromo
         });
 
         if (data.error) throw new Error(data.error);
 
+        // Бесплатный заказ (полностью списан с баланса)
+        if (data.freeOrder) {
+            content.innerHTML = `
+                <div style="font-size:48px;margin:16px 0;">✓</div>
+                <h3 style="margin-bottom:12px;">${currentLang === 'ru' ? 'Заказ оформлен!' : 'Order placed!'}</h3>
+                <p>${currentLang === 'ru' ? 'Товар отправлен вам в ЛС' : 'Product sent to your DM'}</p>
+                <button class="btn-primary" onclick="closeModal('payment-modal');refreshOrders()">${t('my_orders')}</button>
+            `;
+            await loadUser();
+            await loadOrders();
+            renderProfile();
+            renderLevel();
+            renderOrders();
+            updateCounts();
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            return;
+        }
+
         if (data.paymentUrl) {
             const finalAmount = data.amount || currentProduct.price;
             content.innerHTML = `
-                <p>Ссылка для оплаты создана</p>
+                <p>${currentLang === 'ru' ? 'Ссылка для оплаты создана' : 'Payment link created'}</p>
                 <div class="pay-link-box">
-                    <div class="pay-link-label">Сумма: ${finalAmount} ₽</div>
+                    <div class="pay-link-label">${currentLang === 'ru' ? 'Сумма' : 'Amount'}: ${finalAmount} ₽</div>
                     <div class="pay-link-value" id="pay-link-text">${data.paymentUrl}</div>
                     <div class="pay-link-actions">
-                        <a href="${data.paymentUrl}" target="_blank" class="pay-link-btn" onclick="markOrderCreated('${orderId}', ${finalAmount}, '${data.transactionId}')">Открыть</a>
-                        <button class="pay-link-btn copy" onclick="copyPayLink()">Копировать</button>
+                        <a href="${data.paymentUrl}" target="_blank" class="pay-link-btn" onclick="startPolling('${data.transactionId}')">${t('open')}</a>
+                        <button class="pay-link-btn copy" onclick="copyPayLink()">${t('copy')}</button>
                     </div>
                 </div>
-                <p style="font-size:11px;color:var(--text-muted);">Если не оплатить в течение 5 минут — заказ не будет считаться</p>
-                <button class="btn-secondary" onclick="closeModal('payment-modal')">Закрыть</button>
+                <p style="font-size:11px;color:var(--text-muted);">${currentLang === 'ru' ? 'Если не оплатить в течение 5 минут — заказ не будет считаться' : 'Pay within 5 minutes'}</p>
+                <button class="btn-secondary" onclick="closeModal('payment-modal')">${t('close')}</button>
             `;
             window.currentPayLink = data.paymentUrl;
-            window.currentOrderId = orderId;
-            window.currentAmount = finalAmount;
-            window.currentTxId = data.transactionId;
         }
     } catch (e) {
-        content.innerHTML = `<p style="color:var(--danger);padding:20px 0;">Ошибка: ${e.message}</p>
-            <button class="btn-secondary" onclick="closeModal('payment-modal')">Закрыть</button>`;
+        content.innerHTML = `<p style="color:var(--danger);padding:20px 0;">${currentLang === 'ru' ? 'Ошибка' : 'Error'}: ${e.message}</p>
+            <button class="btn-secondary" onclick="closeModal('payment-modal')">${t('close')}</button>`;
     }
 }
 
 function copyPayLink() {
     if (!window.currentPayLink) return;
     navigator.clipboard.writeText(window.currentPayLink).then(() => {
-        showToast('Ссылка скопирована', 'success');
+        showToast(t('link_copied'), 'success');
     });
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
 
-function markOrderCreated(orderId, amount, txId) {
-    orders.push({
-        userId: user.id,
-        productId: currentProduct.id,
-        date: new Date().toLocaleDateString('ru-RU'),
-        status: 'waiting',
-        transactionId: txId,
-        amount: amount,
-        createdAt: Date.now()
-    });
-    saveOrders();
-    renderOrders();
-    updateCounts();
+function startPolling(txId) {
     pollPayment(txId);
 }
 
@@ -1565,21 +2169,19 @@ async function pollPayment(txId) {
             const data = await apiGet(`/check-payment?transaction_id=${txId}`);
             if (['CONFIRMED', 'confirmed', 7, '7'].includes(data.status)) {
                 clearInterval(iv);
-                const ord = orders.find(o => o.transactionId === txId);
-                if (ord) { ord.status = 'completed'; saveOrders(); }
-
                 await loadUser();
+                await loadOrders();
                 renderProfile();
                 renderLevel();
+                renderOrders();
+                updateCounts();
 
                 document.getElementById('pay-content').innerHTML = `
                     <div style="font-size:48px;margin:16px 0;">✓</div>
-                    <h3 style="margin-bottom:12px;">Оплата прошла!</h3>
-                    <p>Напишите <b>@qmarket_support</b></p>
-                    <button class="btn-primary" onclick="closeModal('payment-modal');showPage('orders')">Мои заказы</button>
+                    <h3 style="margin-bottom:12px;">${currentLang === 'ru' ? 'Оплата прошла!' : 'Payment successful!'}</h3>
+                    <p>${currentLang === 'ru' ? 'Товар отправлен вам в ЛС' : 'Product sent to your DM'}</p>
+                    <button class="btn-primary" onclick="closeModal('payment-modal');showPage('orders')">${t('my_orders')}</button>
                 `;
-                renderOrders();
-                updateCounts();
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
         } catch (e) {}
@@ -1587,15 +2189,327 @@ async function pollPayment(txId) {
     }, 10000);
 }
 
+async function refreshOrders() {
+    await loadOrders();
+    await loadUser();
+    renderOrders();
+    renderProfile();
+    renderLevel();
+    updateCounts();
+    showPage('orders');
+}
+
+// ========== BALANCE PROMO ==========
+function openBalancePromoModal() {
+    document.getElementById('balance-promo-input').value = '';
+    document.getElementById('balance-promo-result').innerHTML = '';
+    document.getElementById('balance-promo-modal').classList.add('active');
+}
+
+async function applyBalancePromo() {
+    const code = document.getElementById('balance-promo-input').value.trim().toUpperCase();
+    const result = document.getElementById('balance-promo-result');
+    if (!code) return;
+
+    const check = await apiPost('/promo/check', { code, type: 'balance' });
+    if (!check.valid) {
+        result.innerHTML = `<div class="promo-error">${check.error}</div>`;
+        return;
+    }
+
+    const data = await apiPost('/promo/use', { code, userId: String(user.id) });
+    if (data.error) {
+        result.innerHTML = `<div class="promo-error">${data.error}</div>`;
+        return;
+    }
+
+    result.innerHTML = `<div class="promo-applied"><span class="promo-applied-text">+${check.promo.value} ₽</span></div>`;
+    showToast(`+${check.promo.value} ₽`, 'success');
+
+    await loadUser();
+    renderProfile();
+    renderLevel();
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    setTimeout(() => closeModal('balance-promo-modal'), 1500);
+}
+
 // ========== ADMIN ==========
+document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        adminTab = tab.dataset.tab;
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        ['products', 'stats', 'promos', 'reviews'].forEach(name => {
+            const el = document.getElementById('admin-tab-' + name);
+            if (el) el.style.display = name === adminTab ? 'block' : 'none';
+        });
+        renderAdminTab();
+    });
+});
+
+function renderAdminTab() {
+    if (adminTab === 'products') renderAdmin();
+    else if (adminTab === 'stats') renderAdminStats();
+    else if (adminTab === 'promos') renderAdminPromos();
+    else if (adminTab === 'reviews') renderAdminReviews();
+}
+
+function renderAdmin() {
+    const list = document.getElementById('admin-list');
+    if (products.length === 0) {
+        list.innerHTML = '<div class="empty"><div class="empty-text">Товаров нет</div></div>';
+        return;
+    }
+    list.innerHTML = products.map(p => {
+        const img = p.images && p.images[0]
+            ? `<img src="${p.images[0]}" class="admin-item-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="admin-item-img ph" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`
+            : `<div class="admin-item-img ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+        return `<div class="admin-item">
+            ${img}
+            <div class="admin-item-info">
+                <div class="admin-item-name">${p.name}</div>
+                <div class="admin-item-meta">${p.price} ₽ · ID ${p.id} · ${p.salesCount || 0} продаж</div>
+            </div>
+            <button class="admin-del" onclick="deleteProduct(${p.id})">Удалить</button>
+        </div>`;
+    }).join('');
+}
+
+async function renderAdminStats() {
+    const content = document.getElementById('admin-stats-content');
+    content.innerHTML = '<p style="text-align:center;padding:20px;">Загрузка...</p>';
+    
+    try {
+        const stats = await apiGet(`/admin/stats?userId=${user.id}`);
+        
+        content.innerHTML = `
+            <div class="stats-revenue">
+                <div class="stats-revenue-label">Общий оборот</div>
+                <div class="stats-revenue-value">${stats.revenue.total} ₽</div>
+                <div class="stats-revenue-sub">За всё время</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-card-label">За сегодня</div>
+                    <div class="stats-card-value accent">${stats.revenue.today} ₽</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">За 7 дней</div>
+                    <div class="stats-card-value accent">${stats.revenue.week} ₽</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">За 30 дней</div>
+                    <div class="stats-card-value accent">${stats.revenue.month} ₽</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Юзеров</div>
+                    <div class="stats-card-value">${stats.totalUsers}</div>
+                    <div class="stats-card-sub">+${stats.newUsers7d} за неделю</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Всего заказов</div>
+                    <div class="stats-card-value">${stats.totalOrders}</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Выполнено</div>
+                    <div class="stats-card-value green">${stats.completed}</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">В ожидании</div>
+                    <div class="stats-card-value" style="color:var(--warning);">${stats.waiting}</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Отменено</div>
+                    <div class="stats-card-value" style="color:var(--danger);">${stats.cancelled}</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Кешбек выдан</div>
+                    <div class="stats-card-value green">${stats.cashbackTotal} ₽</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-card-label">Реф-бонусы</div>
+                    <div class="stats-card-value green">${stats.referralTotal} ₽</div>
+                </div>
+            </div>
+            
+            ${stats.topProducts.length > 0 ? `
+                <div class="sidebar-title" style="margin-top:20px;">Топ-5 товаров</div>
+                <div class="stats-top-list">
+                    ${stats.topProducts.map((tp, i) => {
+                        const p = products.find(x => x.id === tp.productId);
+                        const name = p ? p.name : 'Товар #' + tp.productId;
+                        return `<div class="stats-top-item">
+                            <div class="stats-top-rank">${i + 1}</div>
+                            <div class="stats-top-name">${name}</div>
+                            <div class="stats-top-count">${tp.sales} шт</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            ` : ''}
+        `;
+    } catch (e) {
+        content.innerHTML = '<p style="color:var(--danger);text-align:center;padding:20px;">Ошибка загрузки статистики</p>';
+    }
+}
+
+async function renderAdminPromos() {
+    const list = document.getElementById('admin-promos-list');
+    list.innerHTML = '<p style="text-align:center;padding:20px;">Загрузка...</p>';
+    
+    try {
+        const data = await apiGet('/promo/list');
+        const promos = data.promos || [];
+        
+        if (promos.length === 0) {
+            list.innerHTML = '<div class="empty"><div class="empty-text">Промокодов нет</div></div>';
+            return;
+        }
+        
+        list.innerHTML = promos.map(p => {
+            const typeLabel = p.type === 'percent' ? `${p.value}%` : `${p.value} ₽`;
+            const usage = p.maxUses ? `${p.usedCount}/${p.maxUses}` : `${p.usedCount}`;
+            const expires = p.expiresAt ? new Date(p.expiresAt).toLocaleDateString('ru-RU') : '∞';
+            return `<div class="admin-item">
+                <div class="admin-item-info">
+                    <div class="admin-item-name" style="font-family:monospace;color:var(--accent);">${p.code}</div>
+                    <div class="admin-item-meta">${typeLabel} · ${usage} · до ${expires}</div>
+                </div>
+                <button class="admin-del" onclick="deletePromo('${p.code}')">Удалить</button>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = '<p style="color:var(--danger);text-align:center;padding:20px;">Ошибка</p>';
+    }
+}
+
+async function renderAdminReviews() {
+    const list = document.getElementById('admin-reviews-list');
+    list.innerHTML = '<p style="text-align:center;padding:20px;">Загрузка...</p>';
+    
+    try {
+        const data = await apiGet('/reviews/pending');
+        const reviews = data.reviews || [];
+        
+        if (reviews.length === 0) {
+            list.innerHTML = '<div class="empty"><div class="empty-text">Нет отзывов на модерации</div></div>';
+            return;
+        }
+        
+        list.innerHTML = reviews.map(r => {
+            const p = products.find(x => x.id === r.productId);
+            const productName = p ? p.name : 'Товар';
+            const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+            const date = new Date(r.createdAt).toLocaleDateString('ru-RU');
+            return `<div class="review-card">
+                <div class="review-header">
+                    <div class="review-author">
+                        <div class="review-avatar">${(r.userName || '?')[0].toUpperCase()}</div>
+                        <div>
+                            <div class="review-name">${r.userName} <span class="review-pending-badge">Pending</span></div>
+                            <div class="review-date">${date} · ${productName}</div>
+                        </div>
+                    </div>
+                    <div class="review-stars">${stars}</div>
+                </div>
+                <div class="review-text">${r.text}</div>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button class="btn-primary" style="padding:10px;font-size:12px;flex:1;" onclick="approveReview('${r.reviewId}')">Одобрить</button>
+                    <button class="admin-del" style="flex:1;" onclick="deleteReview('${r.reviewId}')">Удалить</button>
+                </div>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = '<p style="color:var(--danger);text-align:center;padding:20px;">Ошибка</p>';
+    }
+}
+
+async function approveReview(reviewId) {
+    await apiPost('/reviews/approve', { userId: user.id, reviewId });
+    showToast('Одобрено', 'success');
+    await loadReviews();
+    renderAdminReviews();
+    renderReviewsPage();
+}
+
+async function deleteReview(reviewId) {
+    if (!confirm('Удалить отзыв?')) return;
+    await apiPost('/reviews/delete', { userId: user.id, reviewId });
+    showToast('Удалено', 'success');
+    renderAdminReviews();
+}
+
+async function deletePromo(code) {
+    if (!confirm('Удалить промокод?')) return;
+    await apiPost('/promo/delete', { userId: user.id, code });
+    showToast('Удалено', 'success');
+    renderAdminPromos();
+}
+
+function openAddPromo() {
+    document.getElementById('edit-title').textContent = 'Новый промокод';
+    document.getElementById('edit-content').innerHTML = `
+        <div class="form-group"><label class="form-label">Код</label><input class="form-input" id="p-code" placeholder="WELCOME10" style="text-transform:uppercase;"></div>
+        <div class="form-group"><label class="form-label">Тип</label>
+            <select class="form-select" id="p-type">
+                <option value="percent">Скидка %</option>
+                <option value="balance">Баланс ₽</option>
+            </select>
+        </div>
+        <div class="form-group"><label class="form-label">Значение</label><input class="form-input" id="p-value" type="number" placeholder="10"></div>
+        <div class="form-group"><label class="form-label">Лимит использований (пусто = ∞)</label><input class="form-input" id="p-max" type="number" placeholder="100"></div>
+        <div class="form-group"><label class="form-label">Срок действия (пусто = ∞)</label><input class="form-input" id="p-expires" type="date"></div>
+        <button class="btn-primary" onclick="savePromo()">Создать</button>
+        <button class="btn-secondary" onclick="closeModal('edit-modal')">Отмена</button>
+    `;
+    document.getElementById('edit-modal').classList.add('active');
+}
+
+async function savePromo() {
+    const code = document.getElementById('p-code').value.trim().toUpperCase();
+    const type = document.getElementById('p-type').value;
+    const value = parseInt(document.getElementById('p-value').value);
+    const maxUses = parseInt(document.getElementById('p-max').value) || null;
+    const expiresStr = document.getElementById('p-expires').value;
+    const expiresAt = expiresStr ? new Date(expiresStr).getTime() : null;
+    
+    if (!code || !value) { showToast('Заполните код и значение', 'error'); return; }
+    
+    const data = await apiPost('/promo/create', {
+        userId: user.id,
+        promo: { code, type, value, maxUses, expiresAt }
+    });
+    
+    if (data.success) {
+        showToast('Создан', 'success');
+        closeModal('edit-modal');
+        renderAdminPromos();
+    } else {
+        showToast(data.error || 'Ошибка', 'error');
+    }
+}
+
 function openAddProduct() {
     document.getElementById('edit-title').textContent = 'Новый товар';
     document.getElementById('edit-content').innerHTML = `
-        <div class="form-group"><label class="form-label">Название</label><input class="form-input" id="f-name" placeholder="VPN Panel"></div>
+        <div class="form-group"><label class="form-label">Название (RU)</label><input class="form-input" id="f-name" placeholder="VPN Panel"></div>
+        <div class="form-group"><label class="form-label">Название (EN)</label><input class="form-input" id="f-name-en" placeholder="VPN Panel"></div>
         <div class="form-group"><label class="form-label">Цена</label><input class="form-input" id="f-price" type="number" placeholder="3990"></div>
         <div class="form-group"><label class="form-label">Тип (bot / webapp)</label><input class="form-input" id="f-type" value="bot"></div>
         <div class="form-group"><label class="form-label">Фото (через запятую)</label><input class="form-input" id="f-images" placeholder="img/1.jpg, img/2.jpg"></div>
-        <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" id="f-desc"></textarea></div>
+        <div class="form-group"><label class="form-label">Ссылка на файл</label><input class="form-input" id="f-file" placeholder="https://files.catbox.moe/xxx.zip"></div>
+        <div class="form-group"><label class="form-label">Описание (RU)</label><textarea class="form-textarea" id="f-desc"></textarea></div>
+        <div class="form-group"><label class="form-label">Описание (EN)</label><textarea class="form-textarea" id="f-desc-en"></textarea></div>
+        <div class="form-group">
+            <label class="form-label">Бейджи</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <label style="display:flex;gap:4px;align-items:center;font-size:12px;"><input type="checkbox" value="hit" class="f-badge"> Хит</label>
+                <label style="display:flex;gap:4px;align-items:center;font-size:12px;"><input type="checkbox" value="new" class="f-badge"> NEW</label>
+                <label style="display:flex;gap:4px;align-items:center;font-size:12px;"><input type="checkbox" value="discount" class="f-badge"> Скидка</label>
+                <label style="display:flex;gap:4px;align-items:center;font-size:12px;"><input type="checkbox" value="recommended" class="f-badge"> Рекомендуем</label>
+            </div>
+        </div>
         <button class="btn-primary" onclick="saveProduct()">Сохранить</button>
         <button class="btn-secondary" onclick="closeModal('edit-modal')">Отмена</button>
     `;
@@ -1604,46 +2518,43 @@ function openAddProduct() {
 
 async function saveProduct() {
     const name = document.getElementById('f-name').value.trim();
+    const name_en = document.getElementById('f-name-en').value.trim();
     const price = parseInt(document.getElementById('f-price').value);
     const type = document.getElementById('f-type').value.trim() || 'bot';
     const imagesStr = document.getElementById('f-images').value.trim();
+    const file = document.getElementById('f-file').value.trim() || null;
     const description = document.getElementById('f-desc').value.trim();
-
-    if (!name || !price) { showToast('Заполните всё', 'error'); return; }
-
+    const description_en = document.getElementById('f-desc-en').value.trim();
+    const badges = Array.from(document.querySelectorAll('.f-badge:checked')).map(cb => cb.value);
+    
+    if (!name || !price) { showToast('Заполните название и цену', 'error'); return; }
+    
     const images = imagesStr ? imagesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-
-    try {
-        const data = await apiPost('/products/add', {
-            userId: user.id,
-            product: { name, price, type, images, description, available: true }
-        });
-        if (data.success) {
-            showToast('Добавлено!', 'success');
-            closeModal('edit-modal');
-            await loadProducts();
-            renderAll();
-            renderAdmin();
-        } else {
-            showToast('Ошибка: ' + (data.error || 'unknown'), 'error');
-        }
-    } catch (e) {
-        showToast('Ошибка сети', 'error');
+    
+    const data = await apiPost('/products/add', {
+        userId: user.id,
+        product: { name, name_en, price, type, images, file, description, description_en, badges, available: true }
+    });
+    
+    if (data.success) {
+        showToast('Добавлено!', 'success');
+        closeModal('edit-modal');
+        await loadProducts();
+        renderAll();
+        renderAdmin();
+    } else {
+        showToast(data.error || 'Ошибка', 'error');
     }
 }
 
 async function deleteProduct(id) {
     if (!confirm('Удалить?')) return;
-    try {
-        const data = await apiPost('/products/delete', { userId: user.id, productId: id });
-        if (data.success) {
-            showToast('Удалено', 'success');
-            await loadProducts();
-            renderAll();
-            renderAdmin();
-        }
-    } catch (e) {
-        showToast('Ошибка', 'error');
+    const data = await apiPost('/products/delete', { userId: user.id, productId: id });
+    if (data.success) {
+        showToast('Удалено', 'success');
+        await loadProducts();
+        renderAll();
+        renderAdmin();
     }
 }
 
@@ -1661,11 +2572,12 @@ function showPage(name) {
     const headerBtn = document.querySelector(`.header-nav-btn[data-page="${name}"]`);
     if (headerBtn) headerBtn.classList.add('active');
 
-    if (name === 'admin') renderAdmin();
+    if (name === 'admin') renderAdminTab();
     if (name === 'orders') renderOrders();
     if (name === 'favorites') renderFav();
     if (name === 'profile') renderProfile();
     if (name === 'level') renderLevel();
+    if (name === 'reviews') renderReviewsPage();
 
     window.scrollTo(0, 0);
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
@@ -1694,9 +2606,7 @@ document.getElementById('desktop-search-input').addEventListener('input', (e) =>
 function copyRefLink() {
     const link = `https://t.me/QuickMarketRobot?start=ref_${user.id}`;
     navigator.clipboard.writeText(link).then(() => {
-        showToast('Ссылка скопирована', 'success');
-    }).catch(() => {
-        showToast('Не удалось скопировать', 'error');
+        showToast(t('ref_copied'), 'success');
     });
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
