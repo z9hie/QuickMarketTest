@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>QuickMarket</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --bg: #0a0a0f;
+    --bg-card: #14141c;
+    --bg-card-hover: #1c1c26;
+    --bg-elevated: #1a1a24;
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(255,255,255,0.12);
+    --text: #ffffff;
+    --text-secondary: #8a8a9e;
+    --text-muted: #4a4a5e;
+    --accent: #2f80ed;
+    --accent-hover: #4a9eff;
+    --accent-glow: rgba(47,128,237,0.35);
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.12);
+    --danger: #ef4444;
+    --danger-bg: rgba(239,68,68,0.12);
+    --warning: #eab308;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --radius-xs: 8px;
+    --header-h: 60px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow-x: hidden; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+}
+
+/* ============ LOADING ============ */
+#loader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+.loader-inner { text-align: center; padding: 20px; }
+.loader-logo {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #fff 0%, #2f80ed 60%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+.loader-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 32px;
+}
+.loader-track {
+    width: 200px;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.loader-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2f80ed, #a855f7);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+.loader-status {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.loader-tip {
+    position: absolute;
+    bottom: 28px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.loader-tip a { color: var(--text-secondary); text-decoration: none; font-weight: 800; }
+
+/* ============ APP SHELL ============ */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+}
+
+/* ============ HEADER (Desktop + Mobile) ============ */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #2f80ed, #a855f7);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px var(--accent-glow);
+    flex-shrink: 0;
+}
+.brand-mark svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 2.2; }
+.brand-name {
+    font-size: 17px; font-weight: 900; letter-spacing: -0.5px;
+    white-space: nowrap;
+}
+.brand-name span { color: var(--text-muted); font-weight: 600; }
+
+/* Desktop nav (скрыт на мобиле) */
+.header-nav {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+.header-nav-btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    font-family: inherit;
+}
+.header-nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.header-nav-btn.active { color: var(--text); background: rgba(255,255,255,0.06); }
+
+/* Desktop search (в хедере) */
+.header-search {
+    display: none;
+    flex: 1;
+    max-width: 420px;
+    position: relative;
+}
+.header-search svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; stroke: var(--text-muted); fill: none; stroke-width: 2;
+    pointer-events: none;
+}
+.header-search input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.header-search input::placeholder { color: var(--text-muted); }
+.header-search input:focus { border-color: var(--border-hover); background: rgba(255,255,255,0.05); }
+
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.icon-btn {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.icon-btn:active { transform: scale(0.95); }
+.icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; }
+.icon-btn.admin { display: none; background: rgba(47,128,237,0.1); border-color: rgba(47,128,237,0.3); color: var(--accent); }
+.icon-btn.admin.visible { display: flex; }
+
+/* Mobile search bar (под хедером) */
+.mobile-search {
+    padding: 12px 20px 8px;
+    position: relative;
+}
+.mobile-search svg {
+    position: absolute; left: 34px; top: 50%; transform: translateY(-70%);
+    width: 15px; height: 15px; stroke: var(--text-muted); fill: none; stroke-width: 2;
+    pointer-events: none;
+}
+.mobile-search input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+}
+.mobile-search input::placeholder { color: var(--text-muted); }
+.mobile-search input:focus { border-color: var(--border-hover); }
+
+/* ============ MAIN LAYOUT ============ */
+.main {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 24px;
+    padding: 0 20px 100px;
+}
+
+/* Sidebar (только Desktop) */
+.sidebar { display: none; width: 240px; flex-shrink: 0; padding-top: 20px; }
+.sidebar-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+}
+.sidebar-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+}
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.sidebar-item.active { background: rgba(47,128,237,0.12); color: var(--accent); }
+.sidebar-item-count {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    color: var(--text-muted);
+}
+.sidebar-item.active .sidebar-item-count { background: rgba(47,128,237,0.2); color: var(--accent); }
+
+.sidebar-price-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.sidebar-price-input {
+    flex: 1;
+    padding: 9px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+}
+.sidebar-price-input:focus { border-color: var(--border-hover); }
+
+.sidebar-sort {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Content */
+.content { flex: 1; min-width: 0; padding-top: 20px; }
+
+/* Promo banner */
+.promo {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2f80ed 60%, #7c3aed 100%);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.promo:hover { transform: translateY(-2px); }
+.promo:active { transform: scale(0.99); }
+.promo::before {
+    content: "";
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+    border-radius: 50%;
+}
+.promo-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+    position: relative;
+}
+.promo-title {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+    position: relative;
+}
+.promo-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    position: relative;
+}
+
+/* Page title */
+.page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.page-head h2 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+}
+.page-head-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+/* Category chips (mobile) */
+.cats-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 8px 20px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -20px;
+}
+.cats-scroll::-webkit-scrollbar { display: none; }
+.cat-chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.cat-chip:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+.cat-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+/* ============ PRODUCT GRID ============ */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* Product card */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    animation: cardIn 0.4s cubic-bezier(0.16,1,0.3,1) backwards;
+    position: relative;
+}
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); }
+.card:active { transform: scale(0.98); }
+
+.card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--bg-elevated);
+    display: block;
+}
+.card-img-ph {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #1a1a24, #14141c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.card-img-ph::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(47,128,237,0.12), transparent 60%);
+}
+.card-img-ph svg {
+    width: 34px; height: 34px;
+    stroke: var(--text-muted);
+    fill: none; stroke-width: 1.5;
+    position: relative; z-index: 1;
+}
+.card-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    padding: 4px 10px;
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    z-index: 2;
+}
+.card-fav {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 32px; height: 32px;
+    background: rgba(10,10,15,0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 2;
+    transition: all 0.2s;
+}
+.card-fav:hover { background: rgba(10,10,15,0.9); }
+.card-fav:active { transform: scale(0.9); }
+.card-fav svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; }
+.card-fav.active svg { stroke: var(--danger); fill: var(--danger); }
+
+.card-body {
+    padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.card-name {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 35px;
+}
+.card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+}
+.card-price {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+}
+.card-cart {
+    width: 32px; height: 32px;
+    background: rgba(47,128,237,0.12);
+    border: 1px solid rgba(47,128,237,0.25);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--accent);
+}
+.card-cart:hover { background: rgba(47,128,237,0.2); }
+.card-cart:active { transform: scale(0.9); }
+.card-cart svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+/* ============ EMPTY ============ */
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+}
+.empty-icon {
+    width: 70px; height: 70px;
+    margin: 0 auto 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+}
+.empty-icon svg { width: 28px; height: 28px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; }
+.empty-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.empty-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* ============ DETAIL PAGE ============ */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    margin-bottom: 16px;
+}
+.back-btn:hover { background: rgba(255,255,255,0.08); }
+.back-btn:active { transform: translateX(-2px); }
+.back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+.detail-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.gallery {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+.gallery-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.gallery-slide {
+    min-width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+}
+.gallery-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.gallery-nav {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 34px; height: 34px;
+    background: rgba(10,10,15,0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.gallery:hover .gallery-nav { opacity: 1; }
+.gallery-nav.prev { left: 12px; }
+.gallery-nav.next { right: 12px; }
+.gallery-nav svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.5; }
+.gallery-dots {
+    position: absolute;
+    bottom: 12px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 5px; z-index: 2;
+    padding: 5px 10px;
+    background: rgba(10,10,15,0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 100px;
+}
+.gallery-dot {
+    width: 5px; height: 5px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.gallery-dot.active { background: #fff; width: 16px; border-radius: 3px; }
+
+.detail-info { flex: 1; }
+.detail-cat {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 4px 10px;
+    background: rgba(47,128,237,0.1);
+    border: 1px solid rgba(47,128,237,0.25);
+    border-radius: 100px;
+    margin-bottom: 12px;
+}
+.detail-name {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+.detail-price {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+}
+.detail-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.detail-desc b { color: var(--text); font-weight: 700; }
+
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 13px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 6px 20px var(--accent-glow);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:active { transform: scale(0.98); box-shadow: 0 3px 10px var(--accent-glow); }
+
+.btn-secondary {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+/* ============ PROFILE (Wave style) ============ */
+.profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+}
+.profile-card::before {
+    content: "";
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    border-radius: 50%;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    position: relative;
+}
+.profile-avatar {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, #2f80ed, #a855f7);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 900;
+    color: #fff;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px var(--accent-glow);
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-info { flex: 1; min-width: 0; position: relative; }
+.profile-name {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+    margin-bottom: 3px;
+}
+.profile-username {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.profile-level {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 100px;
+    letter-spacing: 0.3px;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    position: relative;
+}
+.profile-stat {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+}
+.profile-stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.profile-stat-value {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+.profile-stat-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-weight: 600;
+}
+
+/* Profile promo cards */
+.promo-card {
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.promo-card:hover { transform: translateY(-2px); }
+.promo-card:active { transform: scale(0.99); }
+.promo-card.tiktok {
+    background: linear-gradient(135deg, #1a1a24 0%, #2a1a1a 60%, #3a1a2a 100%);
+    border: 1px solid rgba(239,68,68,0.2);
+}
+.promo-card.referral {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2f80ed 60%, #7c3aed 100%);
+}
+.promo-card-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+}
+.promo-card-title {
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+.promo-card-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.5;
+}
+
+/* Profile menu */
+.profile-menu { display: flex; flex-direction: column; gap: 8px; }
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.profile-menu-item:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+.profile-menu-item:active { transform: translateX(2px); }
+.profile-menu-left {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; font-weight: 700;
+}
+.profile-menu-icon {
+    width: 34px; height: 34px;
+    background: rgba(47,128,237,0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+.profile-menu-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; }
+.profile-menu-arrow { color: var(--text-muted); font-size: 18px; }
+
+/* ============ ORDERS ============ */
+.orders-list { display: flex; flex-direction: column; gap: 10px; }
+.order-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+}
+.order-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.order-name { font-size: 14px; font-weight: 700; line-height: 1.35; flex: 1; }
+.order-badge {
+    font-size: 10px; font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.order-badge.waiting { background: rgba(234,179,8,0.15); color: var(--warning); }
+.order-badge.completed { background: var(--green-bg); color: var(--green); }
+.order-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
+.order-price { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; }
+.order-date { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 600; }
+
+/* ============ BOTTOM NAV (Mobile) ============ */
+.bottom-nav {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 448px;
+    background: rgba(20,20,28,0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 6px;
+    z-index: 100;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    margin-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 14px;
+    cursor: pointer;
+    flex: 1;
+    border-radius: 13px;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    font-family: inherit;
+}
+.nav-btn svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 2; transition: stroke 0.25s; }
+.nav-btn span { font-size: 9px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-muted); transition: color 0.25s; text-transform: uppercase; }
+.nav-btn.active svg { stroke: var(--accent); }
+.nav-btn.active span { color: var(--accent); }
+.nav-btn.active { background: rgba(47,128,237,0.08); }
+
+/* ============ MODALS ============ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 22px;
+    max-width: 400px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    text-align: center;
+    animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal h3 { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
+.modal p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
+
+.pay-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; text-align: left; }
+.pay-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pay-item:has(input:checked) { border-color: var(--accent); background: rgba(47,128,237,0.08); }
+.pay-item input { accent-color: var(--accent); flex-shrink: 0; }
+.pay-item-info { display: flex; flex-direction: column; gap: 2px; }
+.pay-item-title { font-size: 13px; font-weight: 700; }
+.pay-item-desc { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+.form-group { text-align: left; margin-bottom: 12px; }
+.form-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--border-hover); background: rgba(47,128,237,0.04); }
+.form-textarea { resize: vertical; min-height: 80px; }
+
+/* Admin list */
+.admin-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+.admin-item-img {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+}
+.admin-item-img.ph { display: flex; align-items: center; justify-content: center; }
+.admin-item-img.ph svg { width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; }
+.admin-item-info { flex: 1; min-width: 0; }
+.admin-item-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.admin-del {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--danger);
+    padding: 8px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+}
+
+/* ============ TOAST ============ */
+.toast {
+    position: fixed;
+    top: 24px; left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: rgba(20,20,28,0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 20px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 999;
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
+.toast.error { border-color: rgba(239,68,68,0.4); color: var(--danger); }
+
+/* ============ FOOTER ============ */
+.footer {
+    text-align: center;
+    padding: 28px 20px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+.footer a { color: var(--text-secondary); text-decoration: none; font-weight: 800; }
+
+/* ============ PAGES ============ */
+.page { display: none; }
+.page.active { display: block; animation: pageIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ RESPONSIVE ============ */
+
+/* Планшет: 3 колонки */
+@media (min-width: 640px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Планшет: показываем sidebar, скрываем mobile search */
+@media (min-width: 768px) {
+    .sidebar { display: block; }
+    .mobile-search { display: none; }
+    .cats-scroll { display: none; }
+    .header-search { display: block; }
+}
+
+/* Desktop: показываем навигацию в хедере, 4 колонки */
+@media (min-width: 1024px) {
+    .header { padding: 0 32px; }
+    .header-nav { display: flex; }
+    .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .main { padding: 0 32px 100px; gap: 32px; }
+    .sidebar { width: 260px; padding-top: 24px; }
+    .content { padding-top: 24px; }
+    .bottom-nav { display: none; }
+    .detail-layout { flex-direction: row; align-items: flex-start; }
+    .gallery { width: 50%; flex-shrink: 0; }
+    .detail-info { padding-left: 8px; }
+    .promo { padding: 28px 32px; }
+    .promo-title { font-size: 22px; }
+}
+
+/* Очень широкие экраны */
+@media (min-width: 1400px) {
+    .grid { grid-template-columns: repeat(5, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOADER ============ -->
+<div id="loader">
+    <div class="loader-inner">
+        <div class="loader-logo">QuickMarket</div>
+        <div class="loader-sub">loading store</div>
+        <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
+        <div class="loader-status" id="loader-status">Инициализация...</div>
+    </div>
+    <div class="loader-tip">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="brand-name">Quick<span>Market</span></div>
+        </div>
+
+        <!-- Desktop nav -->
+        <nav class="header-nav" id="header-nav">
+            <button class="header-nav-btn active" data-page="catalog">Каталог</button>
+            <button class="header-nav-btn" data-page="orders">Заказы</button>
+            <button class="header-nav-btn" data-page="favorites">Избранное</button>
+        </nav>
+
+        <!-- Desktop search -->
+        <div class="header-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Поиск товаров..." id="desktop-search-input">
+        </div>
+
+        <div class="header-actions">
+            <button class="icon-btn admin" id="admin-btn" onclick="showPage('admin')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.1.4.38.75.75.91.37.16.8.14 1.16-.06l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 15z"/></svg>
+            </button>
+            <button class="icon-btn" onclick="showPage('profile')">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile search -->
+    <div class="mobile-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Поиск товаров..." id="mobile-search-input">
+    </div>
+
+    <!-- ============ CATALOG PAGE ============ -->
+    <div class="page active" id="page-catalog">
+        <div class="main">
+            <!-- SIDEBAR (Desktop) -->
+            <aside class="sidebar">
+                <div class="sidebar-block">
+                    <div class="sidebar-title">Категории</div>
+                    <div id="sidebar-cats"></div>
+                </div>
+                <div class="sidebar-block">
+                    <div class="sidebar-title">Цена</div>
+                    <div class="sidebar-price-row">
+                        <input type="number" class="sidebar-price-input" placeholder="От" id="price-min">
+                        <input type="number" class="sidebar-price-input" placeholder="До" id="price-max">
+                    </div>
+                    <button class="btn-primary" style="padding:10px;font-size:12px;" onclick="applyPriceFilter()">Применить</button>
+                </div>
+                <div class="sidebar-block">
+                    <div class="sidebar-title">Сортировка</div>
+                    <select class="sidebar-sort" id="sort-select" onchange="applySort()">
+                        <option value="default">По умолчанию</option>
+                        <option value="price-asc">Сначала дешёвые</option>
+                        <option value="price-desc">Сначала дорогие</option>
+                        <option value="name">По названию</option>
+                    </select>
+                </div>
+            </aside>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- PROMO -->
+                <div class="promo" onclick="showPage('profile')">
+                    <div class="promo-label">Реферальная программа</div>
+                    <div class="promo-title">Получайте 20% от покупок друзей</div>
+                    <div class="promo-text">Приглашайте друзей и зарабатывайте на их покупках</div>
+                </div>
+
+                <!-- Mobile categories -->
+                <div class="cats-scroll" id="mobile-cats"></div>
+
+                <!-- Page head -->
+                <div class="page-head">
+                    <h2>Каталог</h2>
+                    <span class="page-head-count" id="catalog-count">0 товаров</span>
+                </div>
+
+                <!-- Grid -->
+                <div class="grid" id="grid"></div>
+            </div>
+        </div>
+        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+    </div>
+
+    <!-- ============ DETAIL PAGE ============ -->
+    <div class="page" id="page-detail">
+        <div class="main">
+            <div class="content">
+                <button class="back-btn" onclick="showPage('catalog')">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                    Назад
+                </button>
+                <div class="detail-layout">
+                    <div class="gallery" id="gallery">
+                        <div class="gallery-track" id="gallery-track"></div>
+                        <div class="gallery-nav prev" onclick="shiftSlide(-1)">
+                            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                        </div>
+                        <div class="gallery-nav next" onclick="shiftSlide(1)">
+                            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
+                        <div class="gallery-dots" id="gallery-dots"></div>
+                    </div>
+                    <div class="detail-info">
+                        <div class="detail-cat" id="detail-cat">БОТ</div>
+                        <h1 class="detail-name" id="detail-name"></h1>
+                        <div class="detail-price" id="detail-price"></div>
+                        <div class="detail-desc" id="detail-desc"></div>
+                        <button class="btn-primary" id="buy-btn" onclick="openPayment()">Оплатить</button>
+                        <button class="btn-secondary" onclick="showPage('catalog')">Продолжить покупки</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+    </div>
+
+    <!-- ============ FAVORITES PAGE ============ -->
+    <div class="page" id="page-favorites">
+        <div class="main">
+            <div class="content">
+                <div class="page-head">
+                    <h2>Избранное</h2>
+                    <span class="page-head-count" id="fav-count">0</span>
+                </div>
+                <div class="grid" id="fav-grid"></div>
+            </div>
+        </div>
+        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+    </div>
+
+    <!-- ============ ORDERS PAGE ============ -->
+    <div class="page" id="page-orders">
+        <div class="main">
+            <div class="content">
+                <div class="page-head">
+                    <h2>Мои заказы</h2>
+                    <span class="page-head-count" id="orders-count">0</span>
+                </div>
+                <div class="orders-list" id="orders-list"></div>
+            </div>
+        </div>
+        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+    </div>
+
+    <!-- ============ PROFILE PAGE ============ -->
+    <div class="page" id="page-profile">
+        <div class="main">
+            <div class="content">
+                <div class="page-head">
+                    <h2>Профиль</h2>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profile-avatar">?</div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="profile-name">Пользователь</div>
+                            <div class="profile-username" id="profile-username">@user</div>
+                            <div class="profile-level">Level 1</div>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-label">Покупок</div>
+                            <div class="profile-stat-value" id="stat-purchases">0</div>
+                            <div class="profile-stat-sub">заказов</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-label">Потрачено</div>
+                            <div class="profile-stat-value" id="stat-spent">0 ₽</div>
+                            <div class="profile-stat-sub">всего</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="promo-card referral" onclick="scrollToReferral()">
+                    <div class="promo-card-label">Реферальная программа</div>
+                    <div class="promo-card-title">Получайте 20% от покупок друзей</div>
+                    <div class="promo-card-text">Приглашайте друзей и зарабатывайте</div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="profile-menu-item" onclick="showPage('orders')">
+                        <div class="profile-menu-left">
+                            <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                            Мои заказы
+                        </div>
+                        <div class="profile-menu-arrow">›</div>
+                    </div>
+                    <div class="profile-menu-item" onclick="showPage('favorites')">
+                        <div class="profile-menu-left">
+                            <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+                            Избранное
+                        </div>
+                        <div class="profile-menu-arrow">›</div>
+                    </div>
+                    <div class="profile-menu-item" onclick="openSupport()">
+                        <div class="profile-menu-left">
+                            <div class="profile-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+                            Поддержка
+                        </div>
+                        <div class="profile-menu-arrow">›</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">created by <a href="https://t.me/YslStudio">@YslStudio</a></div>
+    </div>
+
+    <!-- ============ ADMIN PAGE ============ -->
+    <div class="page" id="page-admin">
+        <div class="main">
+            <div class="content">
+                <div class="page-head">
+                    <h2>Админ-панель</h2>
+                </div>
+                <button class="btn-primary" onclick="openAddProduct()" style="margin-bottom:20px;">+ Добавить товар</button>
+                <div id="admin-list"></div>
+                <button class="btn-secondary" onclick="showPage('catalog')">← Назад в каталог</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV (Mobile) -->
+    <nav class="bottom-nav" id="bottom-nav">
+        <button class="nav-btn active" data-page="catalog">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Главная</span>
+        </button>
+        <button class="nav-btn" data-page="favorites">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            <span>Избранное</span>
+        </button>
+        <button class="nav-btn" data-page="orders">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Заказы</span>
+        </button>
+        <button class="nav-btn" data-page="profile">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Профиль</span>
+        </button>
+    </nav>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-overlay" id="support-modal">
+    <div class="modal">
+        <h3>Поддержка</h3>
+        <p>Есть вопрос? Пишите нам!</p>
+        <a href="https://t.me/qmarket_support" target="_blank" class="btn-primary" style="text-decoration:none;display:block;">Написать в поддержку</a>
+        <button class="btn-secondary" onclick="closeModal('support-modal')">Закрыть</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="payment-modal">
+    <div class="modal">
+        <h3 id="pay-title">Оплата</h3>
+        <div id="pay-content"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+        <h3 id="edit-title">Товар</h3>
+        <div id="edit-content" style="text-align:left;"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== TELEGRAM INIT + FULLSCREEN ==========
+const tg = window.Telegram?.WebApp;
+if (tg) {
+    tg.ready();
+    tg.expand();
+    
+    // Fullscreen (Bot API 8.0+)
+    if (tg.requestFullscreen) {
+        tg.requestFullscreen();
+    }
+    
+    // Цвета
+    tg.setHeaderColor('#0a0a0f');
+    tg.setBackgroundColor('#0a0a0f');
+    tg.setBottomBarColor('#0a0a0f');
+    
+    // Отключаем вертикальные свайпы (для fullscreen)
+    if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    
+    // Разрешаем закрытие
+    if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
+}
+
+const SERVER_URL = "https://qmarket.z9hie.workers.dev";
+const ADMIN_ID = 5640325235;
+const user = tg?.initDataUnsafe?.user || { first_name: 'Гость', username: 'guest', id: 0, photo_url: '' };
+const isAdmin = user.id === ADMIN_ID;
+
+// ========== STATE ==========
+let products = [];
+let activeCat = 'all';
+let searchQuery = '';
+let priceMin = null;
+let priceMax = null;
+let sortMode = 'default';
+let favorites = JSON.parse(localStorage.getItem('qm_fav') || '[]');
+let orders = JSON.parse(localStorage.getItem('qm_orders') || '[]');
+let currentProduct = null;
+let currentSlide = 0;
+let slideCount = 0;
+let selectedPayMethod = '2';
+
+// ========== LOADER ==========
+const loaderFill = document.getElementById('loader-fill');
+const loaderStatus = document.getElementById('loader-status');
+const loader = document.getElementById('loader');
+let progress = 0;
+
+const loaderInterval = setInterval(() => {
+    progress += Math.random() * 10 + 3;
+    if (progress > 92) progress = 92;
+    loaderFill.style.width = progress + '%';
+    
+    if (progress < 25) loaderStatus.textContent = 'Подключение к серверу...';
+    else if (progress < 55) loaderStatus.textContent = 'Загрузка товаров...';
+    else if (progress < 85) loaderStatus.textContent = 'Подготовка интерфейса...';
+    else loaderStatus.textContent = 'Почти готово...';
+}, 100);
+
+// ========== API ==========
+async function apiGet(path) {
+    const res = await fetch(SERVER_URL + path);
+    return res.json();
+}
+async function apiPost(path, data) {
+    const res = await fetch(SERVER_URL + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return res.json();
+}
+
+// ========== LOAD ==========
+async function loadProducts() {
+    try {
+        const data = await apiGet('/products');
+        products = Object.values(data);
+        
+        // Предзагрузка картинок
+        const urls = products.flatMap(p => p.images || []).filter(Boolean);
+        await Promise.all(urls.map(url => new Promise(resolve => {
+            const img = new Image();
+            img.onload = img.onerror = resolve;
+            img.src = url;
+        })));
+        
+        return true;
+    } catch (e) {
+        console.error('Load error:', e);
+        return false;
+    }
+}
+
+// ========== INIT ==========
+async function init() {
+    await loadProducts();
+    
+    progress = 100;
+    loaderFill.style.width = '100%';
+    loaderStatus.textContent = 'Готово!';
+    
+    setTimeout(() => {
+        clearInterval(loaderInterval);
+        loader.classList.add('hidden');
+        
+        renderAll();
+        
+        if (isAdmin) document.getElementById('admin-btn').classList.add('visible');
+        
+        checkDeepLink();
+    }, 400);
+}
+
+// ========== DEEP LINK ==========
+function checkDeepLink() {
+    const param = tg?.initDataUnsafe?.start_param;
+    if (param && param.startsWith('product_')) {
+        const id = parseInt(param.replace('product_', ''));
+        setTimeout(() => {
+            const p = products.find(x => x.id === id);
+            if (p) openProduct(id);
+        }, 300);
+    }
+}
+
+// ========== RENDER ==========
+function renderAll() {
+    renderCats();
+    renderGrid();
+    renderFav();
+    renderOrders();
+    renderProfile();
+    updateCounts();
+}
+
+function updateCounts() {
+    document.getElementById('catalog-count').textContent = filteredProducts().length + ' товаров';
+    document.getElementById('fav-count').textContent = favorites.length;
+    const userOrders = orders.filter(o => o.userId === user.id);
+    document.getElementById('orders-count').textContent = userOrders.length + ' заказов';
+}
+
+function filteredProducts() {
+    let filtered = products.filter(p => {
+        const catOk = activeCat === 'all' || (p.type || 'other') === activeCat;
+        const searchOk = !searchQuery || p.name.toLowerCase().includes(searchQuery);
+        const priceOk = (!priceMin || p.price >= priceMin) && (!priceMax || p.price <= priceMax);
+        return catOk && searchOk && priceOk;
+    });
+    
+    if (sortMode === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sortMode === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else if (sortMode === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+    
+    return filtered;
+}
+
+function renderCats() {
+    const cats = ['all', ...new Set(products.map(p => p.type || 'other'))];
+    const labels = { all: 'Все', bot: 'Боты', webapp: 'WebApp', other: 'Другое' };
+    
+    // Mobile chips
+    const mobileCats = document.getElementById('mobile-cats');
+    mobileCats.innerHTML = cats.map(cat => 
+        `<button class="cat-chip ${activeCat === cat ? 'active' : ''}" onclick="setCat('${cat}')">${labels[cat] || cat}</button>`
+    ).join('');
+    
+    // Sidebar
+    const sidebarCats = document.getElementById('sidebar-cats');
+    sidebarCats.innerHTML = cats.map(cat => {
+        const count = products.filter(p => cat === 'all' || (p.type || 'other') === cat).length;
+        return `<div class="sidebar-item ${activeCat === cat ? 'active' : ''}" onclick="setCat('${cat}')">
+            <span>${labels[cat] || cat}</span>
+            <span class="sidebar-item-count">${count}</span>
+        </div>`;
+    }).join('');
+}
+
+function setCat(cat) {
+    activeCat = cat;
+    renderCats();
+    renderGrid();
+    updateCounts();
+    if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+}
+
+function applyPriceFilter() {
+    priceMin = parseInt(document.getElementById('price-min').value) || null;
+    priceMax = parseInt(document.getElementById('price-max').value) || null;
+    renderGrid();
+    updateCounts();
+}
+
+function applySort() {
+    sortMode = document.getElementById('sort-select').value;
+    renderGrid();
+}
+
+function renderGrid() {
+    const grid = document.getElementById('grid');
+    const filtered = filteredProducts();
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty">
+            <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+            <div class="empty-title">Ничего не найдено</div>
+            <div class="empty-text">Попробуйте изменить запрос или категорию</div>
+        </div>`;
+        return;
+    }
+    
+    grid.innerHTML = filtered.map((p, i) => cardHTML(p, i)).join('');
+}
+
+function cardHTML(p, index = 0) {
+    const isFav = favorites.includes(p.id);
+    const typeLabel = p.type === 'webapp' ? 'WEBAPP' : p.type === 'bot' ? 'БОТ' : 'ТОВАР';
+    
+    const imgHTML = p.images && p.images[0]
+        ? `<img src="${p.images[0]}" class="card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="card-img-ph" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
+        : `<div class="card-img-ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    
+    return `<div class="card" style="animation-delay:${index * 0.03}s" onclick="openProduct(${p.id})">
+        <div style="position:relative">
+            ${imgHTML}
+            <div class="card-badge">${typeLabel}</div>
+            <button class="card-fav ${isFav ? 'active' : ''}" onclick="event.stopPropagation();toggleFav(${p.id})">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="card-name">${p.name}</div>
+            <div class="card-bottom">
+                <div class="card-price">${p.price} ₽</div>
+                <button class="card-cart" onclick="event.stopPropagation();quickAdd(${p.id})">
+                    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderFav() {
+    const grid = document.getElementById('fav-grid');
+    const favs = products.filter(p => favorites.includes(p.id));
+    
+    if (favs.length === 0) {
+        grid.innerHTML = `<div class="empty">
+            <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+            <div class="empty-title">Пусто</div>
+            <div class="empty-text">Добавляйте товары в избранное</div>
+        </div>`;
+        return;
+    }
+    grid.innerHTML = favs.map((p, i) => cardHTML(p, i)).join('');
+}
+
+function renderOrders() {
+    const list = document.getElementById('orders-list');
+    const userOrders = orders.filter(o => o.userId === user.id);
+    
+    if (userOrders.length === 0) {
+        list.innerHTML = `<div class="empty">
+            <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+            <div class="empty-title">Нет заказов</div>
+            <div class="empty-text">Купите первый товар</div>
+        </div>`;
+        return;
+    }
+    
+    list.innerHTML = userOrders.map(o => {
+        const p = products.find(x => x.id === o.productId);
+        if (!p) return '';
+        const statusMap = {
+            waiting: { text: 'Ожидание', cls: 'waiting' },
+            completed: { text: 'Выполнен', cls: 'completed' },
+            cancelled: { text: 'Отменён', cls: 'cancelled' }
+        };
+        const st = statusMap[o.status] || { text: o.status, cls: '' };
+        return `<div class="order-card">
+            <div class="order-header">
+                <div class="order-name">${p.name}</div>
+                <div class="order-badge ${st.cls}">${st.text}</div>
+            </div>
+            <div class="order-price">${p.price} ₽</div>
+            <div class="order-date">${o.date}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderProfile() {
+    const avatar = document.getElementById('profile-avatar');
+    if (user.photo_url) {
+        avatar.innerHTML = `<img src="${user.photo_url}" alt="">`;
+    } else {
+        avatar.textContent = (user.first_name || '?')[0].toUpperCase();
+    }
+    document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
+    document.getElementById('profile-username').textContent = '@' + (user.username || 'user');
+    
+    const userOrders = orders.filter(o => o.userId === user.id);
+    const spent = userOrders.filter(o => o.status === 'completed').reduce((sum, o) => {
+        const p = products.find(x => x.id === o.productId);
+        return sum + (p ? p.price : 0);
+    }, 0);
+    
+    document.getElementById('stat-purchases').textContent = userOrders.length;
+    document.getElementById('stat-spent').textContent = spent + ' ₽';
+}
+
+function renderAdmin() {
+    const list = document.getElementById('admin-list');
+    if (products.length === 0) {
+        list.innerHTML = '<div class="empty"><div class="empty-text">Товаров нет</div></div>';
+        return;
+    }
+    list.innerHTML = products.map(p => {
+        const img = p.images && p.images[0]
+            ? `<img src="${p.images[0]}" class="admin-item-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="admin-item-img ph" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`
+            : `<div class="admin-item-img ph"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+        return `<div class="admin-item">
+            ${img}
+            <div class="admin-item-info">
+                <div class="admin-item-name">${p.name}</div>
+                <div class="admin-item-meta">${p.price} ₽ · ID ${p.id}</div>
+            </div>
+            <button class="admin-del" onclick="deleteProduct(${p.id})">Удалить</button>
+        </div>`;
+    }).join('');
+}
+
+// ========== FAVORITES ==========
+function toggleFav(id) {
+    const i = favorites.indexOf(id);
+    if (i > -1) favorites.splice(i, 1);
+    else favorites.push(id);
+    localStorage.setItem('qm_fav', JSON.stringify(favorites));
+    renderGrid();
+    renderFav();
+    updateCounts();
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+function quickAdd(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    openProduct(id);
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+// ========== PRODUCT ==========
+function openProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    currentProduct = p;
+    currentSlide = 0;
+    
+    document.getElementById('detail-cat').textContent = p.type === 'webapp' ? 'WEBAPP' : 'БОТ';
+    document.getElementById('detail-name').textContent = p.name;
+    document.getElementById('detail-price').textContent = p.price + ' ₽';
+    document.getElementById('detail-desc').innerHTML = (p.description || '').replace(/\n/g, '<br>');
+    
+    const track = document.getElementById('gallery-track');
+    const dots = document.getElementById('gallery-dots');
+    const images = p.images && p.images.length > 0 ? p.images : [];
+    
+    if (images.length === 0) {
+        track.innerHTML = `<div class="gallery-slide"><div class="card-img-ph" style="width:100%;height:100%;display:flex;aspect-ratio:unset"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></div>`;
+        dots.innerHTML = '';
+        slideCount = 1;
+    } else {
+        track.innerHTML = images.map(src => `<div class="gallery-slide"><img src="${src}" onerror="this.style.opacity='0.3'"></div>`).join('');
+        dots.innerHTML = images.length > 1 ? images.map((_, i) => `<div class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="goSlide(${i})"></div>`).join('') : '';
+        slideCount = images.length;
+    }
+    
+    track.style.transform = 'translateX(0)';
+    showPage('detail');
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+function goSlide(i) {
+    currentSlide = i;
+    document.getElementById('gallery-track').style.transform = `translateX(-${i * 100}%)`;
+    document.querySelectorAll('.gallery-dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+}
+function shiftSlide(dir) {
+    if (slideCount <= 1) return;
+    goSlide((currentSlide + dir + slideCount) % slideCount);
+}
+
+// ========== PAYMENT ==========
+function openPayment() {
+    if (!currentProduct) return;
+    const modal = document.getElementById('payment-modal');
+    document.getElementById('pay-title').textContent = `Оплата · ${currentProduct.price} ₽`;
+    document.getElementById('pay-content').innerHTML = `
+        <p>${currentProduct.name}</p>
+        <div class="pay-list">
+            <label class="pay-item">
+                <input type="radio" name="pay" value="2" checked onchange="selectedPayMethod='2'">
+                <div class="pay-item-info">
+                    <div class="pay-item-title">СБП QR</div>
+                    <div class="pay-item-desc">QR-код для оплаты</div>
+                </div>
+            </label>
+            <label class="pay-item">
+                <input type="radio" name="pay" value="11" onchange="selectedPayMethod='11'">
+                <div class="pay-item-info">
+                    <div class="pay-item-title">Банковская карта</div>
+                    <div class="pay-item-desc">МИР, Visa, Mastercard</div>
+                </div>
+            </label>
+            <label class="pay-item">
+                <input type="radio" name="pay" value="13" onchange="selectedPayMethod='13'">
+                <div class="pay-item-info">
+                    <div class="pay-item-title">Криптовалюта</div>
+                    <div class="pay-item-desc">USDT и другие</div>
+                </div>
+            </label>
+        </div>
+        <button class="btn-primary" onclick="createPayment()">Перейти к оплате</button>
+        <button class="btn-secondary" onclick="closeModal('payment-modal')">Отмена</button>
+    `;
+    modal.classList.add('active');
+}
+
+async function createPayment() {
+    if (!currentProduct) return;
+    const content = document.getElementById('pay-content');
+    content.innerHTML = '<p style="padding:30px 0;text-align:center;">Создаём платёж...</p>';
+    
+    try {
+        const orderId = `order_${Date.now()}_${currentProduct.id}_${user.id}`;
+        const data = await apiPost('/create-payment', {
+            productId: currentProduct.id,
+            userId: String(user.id),
+            userName: user.username ? '@' + user.username : (user.first_name || ''),
+            paymentMethod: selectedPayMethod
+        });
+        
+        if (data.error) throw new Error(data.error);
+        
+        if (data.paymentUrl) {
+            window.open(data.paymentUrl, '_blank');
+            
+            orders.push({
+                userId: user.id,
+                productId: currentProduct.id,
+                date: new Date().toLocaleDateString('ru-RU'),
+                status: 'waiting',
+                transactionId: data.transactionId
+            });
+            localStorage.setItem('qm_orders', JSON.stringify(orders));
+            renderOrders();
+            updateCounts();
+            
+            content.innerHTML = `
+                <p style="padding:20px 0;">Ожидаем оплату...</p>
+                <p style="font-size:12px;color:var(--warning);">Не закрывайте окно!</p>
+            `;
+            
+            pollPayment(data.transactionId);
+        }
+    } catch (e) {
+        content.innerHTML = `<p style="color:var(--danger);padding:20px 0;">Ошибка: ${e.message}</p>
+            <button class="btn-secondary" onclick="closeModal('payment-modal')">Закрыть</button>`;
+    }
+}
+
+async function pollPayment(txId) {
+    let attempts = 0;
+    const iv = setInterval(async () => {
+        attempts++;
+        try {
+            const data = await apiGet(`/check-payment?transaction_id=${txId}`);
+            if (['CONFIRMED', 'confirmed', 7, '7'].includes(data.status)) {
+                clearInterval(iv);
+                const ord = orders.find(o => o.transactionId === txId);
+                if (ord) { ord.status = 'completed'; localStorage.setItem('qm_orders', JSON.stringify(orders)); }
+                document.getElementById('pay-content').innerHTML = `
+                    <div style="font-size:48px;margin:16px 0;">✅</div>
+                    <h3 style="margin-bottom:12px;">Оплата прошла!</h3>
+                    <p>Напишите <b>@qmarket_support</b></p>
+                    <button class="btn-primary" onclick="closeModal('payment-modal');showPage('orders')">Мои заказы</button>
+                `;
+                renderOrders();
+                renderProfile();
+                updateCounts();
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
+        } catch (e) {}
+        if (attempts >= 18) clearInterval(iv);
+    }, 10000);
+}
+
+// ========== ADMIN ==========
+function openAddProduct() {
+    document.getElementById('edit-title').textContent = 'Новый товар';
+    document.getElementById('edit-content').innerHTML = `
+        <div class="form-group"><label class="form-label">Название</label><input class="form-input" id="f-name" placeholder="VPN Panel"></div>
+        <div class="form-group"><label class="form-label">Цена</label><input class="form-input" id="f-price" type="number" placeholder="3990"></div>
+        <div class="form-group"><label class="form-label">Тип (bot / webapp)</label><input class="form-input" id="f-type" value="bot"></div>
+        <div class="form-group"><label class="form-label">Фото (через запятую)</label><input class="form-input" id="f-images" placeholder="img/1.jpg, img/2.jpg"></div>
+        <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" id="f-desc"></textarea></div>
+        <button class="btn-primary" onclick="saveProduct()">Сохранить</button>
+        <button class="btn-secondary" onclick="closeModal('edit-modal')">Отмена</button>
+    `;
+    document.getElementById('edit-modal').classList.add('active');
+}
+
+async function saveProduct() {
+    const name = document.getElementById('f-name').value.trim();
+    const price = parseInt(document.getElementById('f-price').value);
+    const type = document.getElementById('f-type').value.trim() || 'bot';
+    const imagesStr = document.getElementById('f-images').value.trim();
+    const description = document.getElementById('f-desc').value.trim();
+    
+    if (!name || !price) { showToast('Заполните всё', 'error'); return; }
+    
+    const images = imagesStr ? imagesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    try {
+        const data = await apiPost('/products/add', {
+            userId: user.id,
+            product: { name, price, type, images, description, available: true }
+        });
+        if (data.success) {
+            showToast('Добавлено!', 'success');
+            closeModal('edit-modal');
+            await loadProducts();
+            renderAll();
+            renderAdmin();
+        } else {
+            showToast('Ошибка: ' + (data.error || 'unknown'), 'error');
+        }
+    } catch (e) {
+        showToast('Ошибка сети', 'error');
+    }
+}
+
+async function deleteProduct(id) {
+    if (!confirm('Удалить?')) return;
+    try {
+        const data = await apiPost('/products/delete', { userId: user.id, productId: id });
+        if (data.success) {
+            showToast('Удалено', 'success');
+            await loadProducts();
+            renderAll();
+            renderAdmin();
+        }
+    } catch (e) {
+        showToast('Ошибка', 'error');
+    }
+}
+
+// ========== NAV ==========
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.header-nav-btn').forEach(b => b.classList.remove('active'));
+    
+    const page = document.getElementById('page-' + name);
+    if (page) page.classList.add('active');
+    
+    const navBtn = document.querySelector(`.nav-btn[data-page="${name}"]`);
+    if (navBtn) navBtn.classList.add('active');
+    const headerBtn = document.querySelector(`.header-nav-btn[data-page="${name}"]`);
+    if (headerBtn) headerBtn.classList.add('active');
+    
+    if (name === 'admin') renderAdmin();
+    if (name === 'orders') renderOrders();
+    if (name === 'favorites') renderFav();
+    if (name === 'profile') renderProfile();
+    
+    window.scrollTo(0, 0);
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+document.querySelectorAll('.header-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+
+// ========== SEARCH ==========
+document.getElementById('mobile-search-input').addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    renderGrid();
+    updateCounts();
+});
+document.getElementById('desktop-search-input').addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    renderGrid();
+    updateCounts();
+});
+
+// ========== SUPPORT ==========
+function openSupport() { document.getElementById('support-modal').classList.add('active'); }
+
+// ========== MODALS ==========
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', (e) => { if (e.target === m) closeModal(m.id); });
+});
+
+// ========== TOAST ==========
+function showToast(text, type = '') {
+    const toast = document.getElementById('toast');
+    toast.textContent = text;
+    toast.className = 'toast show ' + type;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function scrollToReferral() {
+    showPage('profile');
+    showToast('Ссылка на рефку будет в @WebAppVPNbot');
+}
+
+// ========== START ==========
+init();
+</script>
+</body>
+</html>
